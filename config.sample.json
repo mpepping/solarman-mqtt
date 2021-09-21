@@ -1,0 +1,16 @@
+{
+  "name": "Trannergy",
+  "url": "api.solarmanpv.com",
+  "appid": "",
+  "secret": "",
+  "username": "",
+  "passhash": "",
+  "stationId": 123,
+  "mqtt":{
+    "broker": "1.1.1.1",
+    "port": 1883,
+    "username": "",
+    "password": ""
+  }
+}
+

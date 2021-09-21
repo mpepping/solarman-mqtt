@@ -1,0 +1,8 @@
+# IDE
+*swp
+.idea
+*.iml
+
+# Project
+*.pyc
+config.json

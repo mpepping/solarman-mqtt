@@ -1,6 +1,6 @@
 # solarman-mqtt
 
-Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics (for example Trannergy). 
+Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example are the Trannergy PV converters.
 
 ```lang=bash
 podman run -ti --rm ghcr.io/mpepping/solarman-mqtt:latest -h
@@ -24,5 +24,5 @@ You can run this script as a Docker container or in Python 3. Either way a confi
 
 Docker example to run this script every 5 minutes and providing a config file:
 
-`docker run -ti --rm -v config.json:/opt/app-root/src test`
+`docker run -ti --rm -v config.json:/opt/app-root/src ghcr.io/mpepping/solarman-mqtt:latest`
 

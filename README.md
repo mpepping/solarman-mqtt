@@ -1,6 +1,6 @@
 # solarman-mqtt
 
-Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example are the Trannergy PV converters.
+Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example is the Trannergy PV converter.
 
 ```lang=bash
 podman run -ti --rm ghcr.io/mpepping/solarman-mqtt:latest -h
@@ -11,7 +11,7 @@ Collect data from Trannergy / Solarman API
 
 optional arguments:
 -h, --help                       show this help message and exit
--d, --daemon                     run as a service
+-d, --daemon                     run as a service (default)
 -s, --single                     single run and exit
 -i INTERVAL, --interval INTERVAL run interval in seconds (default 300 sec.)
 -f FILE, --file FILE             config file (default ./config.json)

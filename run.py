@@ -11,7 +11,7 @@ import time
 
 import mqtt
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def load_config(file):
@@ -19,13 +19,9 @@ def load_config(file):
     Load configuration
     :return:
     """
-    try:
-        f = open(file)
-    except:
-        logging.error("Could not open {}".format(file))
-        sys.exit(1)
-    config = json.load(f)
-    return config
+    with open(file, "r", encoding="utf-8") as config_file:
+        config = json.load(config_file)
+        return config
 
 
 def today():
@@ -52,14 +48,14 @@ def get_token(url, appid, secret, username, passhash):
         headers = {
             'Content-Type': 'application/json'
         }
-        url = "//account/v1.0/token?appId={}&language=en".format(appid)
+        url = f"//account/v1.0/token?appId={appid}&language=en"
         conn.request("POST", url, payload, headers)
         res = conn.getresponse()
         data = json.loads(res.read())
-        logging.info("Received token")
+        logging.debug("Received token")
         return data["access_token"]
-    except:
-        logging.error("Unable to fetch token")
+    except Exception as error:  # pylint: disable=broad-except
+        logging.error("Unable to fetch token: %s", str(error))
         sys.exit(1)
 
 
@@ -82,9 +78,8 @@ def get_power_realtime(url, stationid, token):
     watts = data["generationPower"]
     if isinstance(watts, float):
         return watts
-    else:
-        logging.error("Unable to get watts")
-        sys.exit(1)
+    logging.error("Unable to get watts")
+    sys.exit(1)
 
 
 def get_energy_today(url, stationid, token):
@@ -110,9 +105,8 @@ def get_energy_today(url, stationid, token):
     kwh = data["stationDataItems"][0]["generationValue"]
     if isinstance(kwh, float):
         return kwh
-    else:
-        logging.error("Unable to get kWh")
-        exit(1)
+    logging.error("Unable to get kWh")
+    sys.exit(1)
 
 
 def single_run(file):
@@ -121,24 +115,36 @@ def single_run(file):
     :return:
     """
     config = load_config(file)
-    token = get_token(config["url"], config["appid"], config["secret"], config["username"], config["passhash"])
-    t = time.strftime("%Y-%m-%d %H:%M:%S")
-    w = get_power_realtime(config["url"], config["stationId"], token)
-    kw = get_energy_today(config["url"], config["stationId"], token)
-    mqtt.main(config["mqtt"], "solar/power", w)
-    mqtt.main(config["mqtt"], "solar/energy", kw)
-    logging.info("{} - {}kWH day total and currently {}W".format(t, kw, w))
+    token = get_token(
+                        config["url"],
+                        config["appid"],
+                        config["secret"],
+                        config["username"],
+                        config["passhash"]
+                      )
+    _t = time.strftime("%Y-%m-%d %H:%M:%S")
+    _w = get_power_realtime(config["url"], config["stationId"], token)
+    _kw = get_energy_today(config["url"], config["stationId"], token)
+    mqtt.message(config["mqtt"], "solar/power", _w)
+    mqtt.message(config["mqtt"], "solar/energy", _kw)
+    logging.info("%s - %s kWH day total and currently %s W", _t, _kw, _w)
 
 
 def daemon(file, interval):
+    """
+    Run as a daemon process
+    :param file: Config file
+    :param interval: Run interval in seconds
+    :return:
+    """
     interval = int(interval)
-    logging.info("Starting daemonized with a {} seconds run interval".format(str(interval)))
+    logging.info("Starting daemonized with a %s seconds run interval", str(interval))
     while True:
         try:
             single_run(file)
             time.sleep(interval)
-        except:
-            logging.error("Catched break .. exiting")
+        except Exception as error:  # pylint: disable=broad-except
+            logging.error("Error on start: %s", str(error))
             sys.exit(1)
 
 
@@ -148,11 +154,21 @@ def main():
     :return:
     """
     parser = argparse.ArgumentParser(description="Collect data from Trannergy / Solarman API")
-    parser.add_argument("-d", "--daemon", action="store_true", help="run as a service")
-    parser.add_argument("-s", "--single", action="store_true", help="single run and exit")
-    parser.add_argument("-i", "--interval", default="300", help="run interval in seconds (default 300 sec.)")
-    parser.add_argument("-f", "--file", default="config.json", help="config file (default ./config.json)")
-    parser.add_argument("-v", "--version", action='version', version='%(prog)s 0.0.1')
+    parser.add_argument("-d", "--daemon",
+                        action="store_true",
+                        help="run as a service")
+    parser.add_argument("-s", "--single",
+                        action="store_true",
+                        help="single run and exit")
+    parser.add_argument("-i", "--interval",
+                        default="300",
+                        help="run interval in seconds (default 300 sec.)")
+    parser.add_argument("-f", "--file",
+                        default="config.json",
+                        help="config file (default ./config.json)")
+    parser.add_argument("-v", "--version",
+                        action='version',
+                        version='%(prog)s 0.0.1')
     args = parser.parse_args()
     if args.single:
         single_run(args.file)

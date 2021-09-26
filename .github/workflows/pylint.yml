@@ -23,4 +23,4 @@ jobs:
         pip install pylint paho_mqtt
     - name: Analysing the code with pylint
       run: |
-        pylint --disable=R,C `ls -R|grep .py$|xargs`
+        pylint `ls -R|grep .py$|xargs`

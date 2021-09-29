@@ -22,7 +22,33 @@ optional arguments:
 
 You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>. 
 
+
+### Using Docker
+
 Docker example to run this script every 5 minutes and providing a config file:
 
-`docker run -ti --rm -v config.json:/opt/app-root/src ghcr.io/mpepping/solarman-mqtt:latest`
+`docker run -ti --rm -v $PWD/config.json:/opt/app-root/src ghcr.io/mpepping/solarman-mqtt:latest`
+
+
+### Using docker-compose
+
+This `docker-compose.yml` example can be used with docker-compose or podman-compose
+
+```lang=yaml
+version: '3'
+
+services:
+  solarman-mqtt:
+    image: ghcr.io/mpepping/solarman-mqtt:latest
+    container_name: "solarman-mqtt"
+    environment:
+    - TZ=Europe/Amsterdam
+    volumes:
+      - ./config.json:/opt/app-root/src/config.json
+    restart: always
+```
+
+### Using Python
+
+Run `pip install -r requirements.txt` and start `python3 run.py`.
 

@@ -6,8 +6,8 @@ name: Container Image
 # documentation.
 
 on:
-  schedule:
-    - cron: '31 23 * * *'
+  # schedule:
+  #  - cron: '31 23 * * *'
   push:
     branches: [ main ]
     # Publish semver tags as releases.

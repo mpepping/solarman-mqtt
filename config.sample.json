@@ -6,6 +6,8 @@
   "username": "",
   "passhash": "",
   "stationId": 123,
+  "inverterId": 456,
+  "loggerId": 789,
   "mqtt":{
     "broker": "1.1.1.1",
     "port": 1883,

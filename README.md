@@ -22,6 +22,99 @@ optional arguments:
 
 You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>. 
 
+## MQTT topics
+
+### Station (Plant)
+
+```
+solarmanpv/station/batteryPower
+solarmanpv/station/batterySoc
+solarmanpv/station/chargePower
+solarmanpv/station/code
+solarmanpv/station/dischargePower
+solarmanpv/station/generationPower
+solarmanpv/station/gridPower
+solarmanpv/station/irradiateIntensity
+solarmanpv/station/lastUpdateTime
+solarmanpv/station/msg
+solarmanpv/station/purchasePower
+solarmanpv/station/requestId
+solarmanpv/station/success
+solarmanpv/station/usePower
+solarmanpv/station/wirePower
+```
+
+### Inverter
+
+```
+solarmanpv/inverter/code
+solarmanpv/inverter/deviceId
+solarmanpv/inverter/deviceSn
+solarmanpv/inverter/deviceState
+solarmanpv/inverter/deviceType
+solarmanpv/inverter/msg
+solarmanpv/inverter/requestId
+solarmanpv/inverter/success
+
+solarmanpv/inverter/attributes # contains all inverter datalist entries.
+```
+
+#### Attributes: 
+```
+SN, Device Type, Production Compliance Type, Rated Power, Year, Month, Day, Hour, Minute, Seconds, Communication Protocol Version,Control Board Firmware Version, Communication Board Firmware Version, DC Voltage PV1, DC Voltage PV2, DC Voltage PV3, DC Voltage PV4, DC Current PV1, DC Current PV2, DC Current PV3, DC Current PV4, DC Power PV1, DC Power PV2, DC Power PV3, DC Power PV4, AC Voltage 1, AC Current 1, Total AC Output Power(Active), AC Output Frequency 1, Total Production(Active), Total Production 1, Total Production 2, Total Production 3, Total Production 4, Daily Production(Active), Daily Production 1, Daily Production 2, Daily Production 3, Daily Production 4, AC Radiator Temp, Micro Inverter Port 1, Micro Inverter Port 2,Micro Inverter Port 3, 
+Micro Inverter Port 4, Number Of MPPT Paths, Number Of Phases, Running Status, Overfrequency And Load Reduction Starting Point, Islanding Protection Enabled, Overfrequency And Load Reduction Percentage, GFDI Enabled, Grid-connected Standard, Grid Voltage Upper Limit, Grid Voltage Lower Limit, Grid Frequency Upper Limit, Grid Frequency Lower Limit, Start-up Self-checking Time
+```
+Each attribute has .value and .unit
+
+### Logger (Collector)
+
+```
+solarmanpv/logger/code
+solarmanpv/logger/deviceId
+solarmanpv/logger/deviceSn
+solarmanpv/logger/deviceState
+solarmanpv/logger/deviceType
+solarmanpv/logger/msg
+solarmanpv/logger/requestId
+solarmanpv/logger/success
+
+solarmanpv/logger/attributes # contains all logger datalist entries
+```
+
+#### Attributes
+```
+Embedded Device SN, Module Version No, Extended System Version, Total running time, Offset time, Data Uploading Period, Data Acquisition Period, Max. No. of Connected Devices, Signal Strength, Heart Rate, IV Curve Supported, Batch Command Supported, Support Reporting Upgrading Progress, AT+UPGRADE Command Supported, Method Of Protocol Upgrade
+```
+Each attribute has .value and .unit
+
+## Home Assistant
+```
+sensor:
+  - platform: mqtt
+    name: "solarmanpv_station_generationPower"
+    state_topic: "solarmanpv/station/generationPower"
+    unit_of_measurement: "W"
+    state_class: measurement
+```
+
+Repeat for every station topic needed. 
+
+```
+sensor:
+  - platform: mqtt
+    name: "solarmanpv_inverter"
+    state_topic: "solarmanpv/inverter/deviceState"
+    json_attributes_topic: "solarmanpv/inverter/attributes"
+    
+  - platform: mqtt
+    name: "solarmanpv_logger"
+    state_topic: "solarmanpv/logger/deviceState"
+    json_attributes_topic: "solarmanpv/logger/attributes"
+```
+
+Extract inverter and logger attributes as usual by means of e.g. templates.
+
+# Docker Usage has not been updated yet for this fork. However, Dockerfile in this repo should work. 
 
 ### Using Docker
 

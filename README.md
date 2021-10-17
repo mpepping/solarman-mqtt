@@ -53,8 +53,63 @@ solarmanpv/inverter/attributes # contains all inverter datalist entries.
 
 #### Attributes: 
 ```
-SN, Device Type, Production Compliance Type, Rated Power, Year, Month, Day, Hour, Minute, Seconds, Communication Protocol Version,Control Board Firmware Version, Communication Board Firmware Version, DC Voltage PV1, DC Voltage PV2, DC Voltage PV3, DC Voltage PV4, DC Current PV1, DC Current PV2, DC Current PV3, DC Current PV4, DC Power PV1, DC Power PV2, DC Power PV3, DC Power PV4, AC Voltage 1, AC Current 1, Total AC Output Power(Active), AC Output Frequency 1, Total Production(Active), Total Production 1, Total Production 2, Total Production 3, Total Production 4, Daily Production(Active), Daily Production 1, Daily Production 2, Daily Production 3, Daily Production 4, AC Radiator Temp, Micro Inverter Port 1, Micro Inverter Port 2,Micro Inverter Port 3, 
-Micro Inverter Port 4, Number Of MPPT Paths, Number Of Phases, Running Status, Overfrequency And Load Reduction Starting Point, Islanding Protection Enabled, Overfrequency And Load Reduction Percentage, GFDI Enabled, Grid-connected Standard, Grid Voltage Upper Limit, Grid Voltage Lower Limit, Grid Frequency Upper Limit, Grid Frequency Lower Limit, Start-up Self-checking Time
+SN: XXXXXXXXXX
+Device_Type: 4
+Production_Compliance_Type: 0
+Rated_Power: 300.00
+Year: 48
+Month: 0
+Day: 0
+Hour: 0
+Minute: 0
+Seconds: 0
+Communication_Protocol_Version: V0.2.0.1
+Control_Board_Firmware_Version: V0.1.1.2
+Communication_Board_Firmware_Version: V0.2.0.7
+DC_Voltage_PV1: 0.00
+DC_Voltage_PV2: 0.00
+DC_Voltage_PV3: 0.00
+DC_Voltage_PV4: 0.00
+DC_Current_PV1: 0.00
+DC_Current_PV2: 0.00
+DC_Current_PV3: 0.00
+DC_Current_PV4: 0.00
+DC_Power_PV1: 0.00
+DC_Power_PV2: 0.00
+DC_Power_PV3: 0.00
+DC_Power_PV4: 0.00
+AC_Voltage_1: 0.00
+AC_Current_1: 0.00
+Total_AC_Output_Power(Active): 0
+AC_Output_Frequency_1: 0.00
+Total_Production(Active): 2.50
+Total_Production_1: 2.50
+Total_Production_2: 0.00
+Total_Production_3: 0.00
+Total_Production_4: 0.00
+Daily_Production(Active): 0.70
+Daily_Production_1: 0.70
+Daily_Production_2: 0.00
+Daily_Production_3: 0.00
+Daily_Production_4: 0.00
+AC_Radiator_Temp: -10.00
+Micro_Inverter_Port_1: XXXXXXXXXX-1
+Micro_Inverter_Port_2: XXXXXXXXXX-2
+Micro_Inverter_Port_3: XXXXXXXXXX-3
+Micro_Inverter_Port_4: XXXXXXXXXX-4
+Number_Of_MPPT_Paths: 1
+Number_Of_Phases: 1
+Running_Status: 4
+Overfrequency_And_Load_Reduction_Starting_Point: 50.20
+Islanding Protection Enabled: Enable
+Overfrequency_And_Load_Reduction_Percentage: 44
+GFDI Enabled: Disable
+Grid-connected Standard: 0
+Grid Voltage_Upper_Limit: 275.00
+Grid Voltage_Lower_Limit: 180.00
+Grid Frequency_Upper_Limit: 52.00
+Grid Frequency_Lower_Limit: 47.50
+Start-up Self-checking Time: 60
 ```
 
 ### Logger (Collector)
@@ -70,7 +125,21 @@ solarmanpv/logger/attributes # contains all logger datalist entries
 
 #### Attributes
 ```
-Embedded Device SN, Module Version No, Extended System Version, Total running time, Offset time, Data Uploading Period, Data Acquisition Period, Max. No. of Connected Devices, Signal Strength, Heart Rate, IV Curve Supported, Batch Command Supported, Support Reporting Upgrading Progress, AT+UPGRADE Command Supported, Method Of Protocol Upgrade
+Embedded_Device_SN: XXXXXXXXXX
+Module_Version_No: MW3_15_5406_1.35
+Extended_System_Version: V1.1.00.07
+Total_running_time: 1
+Offset_time: 1634486607
+Data_Uploading_Period: 5
+Data_Acquisition_Period: 60
+Max._No._of_Connected_Devices: 1
+Signal_Strength: 100
+Heart_Rate: 120
+IV_Curve_Supported: 1
+Batch_Command_Supported: 1
+Support_Reporting_Upgrading_Progress: 0
+AT+UPGRADE_Command_Supported: 255
+Method_Of_Protocol_Upgrade: 255
 ```
 
 ## Home Assistant

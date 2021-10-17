@@ -121,16 +121,11 @@ template:
       unit_of_measurement: 'V'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
       state_class: measurement
+      
   - sensor:
     - name: solarmanpv_inverter_dc_current_pv1
       unit_of_measurement: 'A'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV1') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_dc_power_pv1
-      unit_of_measurement: 'W'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
       state_class: measurement
       
   - sensor:

@@ -58,12 +58,7 @@ def get_token(url, appid, secret, username, passhash):
         logging.error("Unable to fetch token: %s", str(error))
         sys.exit(1)
 
-
-def get_power_realtime(url, stationid, token):
-    """
-    Return current energy usage in W
-    :return:
-    """
+def get_station_realtime(url, stationid, token):
     conn = http.client.HTTPSConnection(url)
     payload = json.dumps({
         "stationId": stationid
@@ -75,39 +70,32 @@ def get_power_realtime(url, stationid, token):
     conn.request("POST", "//station/v1.0/realTime?language=en", payload, headers)
     res = conn.getresponse()
     data = json.loads(res.read())
-    watts = data["generationPower"]
-    if isinstance(watts, float):
-        return watts
-    logging.error("Unable to get watts")
-    sys.exit(1)
+    return data
 
-
-def get_energy_today(url, stationid, token):
-    """
-    Return today usage in kW
-    :return:
-    """
-    date = today()
+def get_device_currentData(url, deviceSn, token):
     conn = http.client.HTTPSConnection(url)
     payload = json.dumps({
-        "startTime": date,
-        "timeType": 2,
-        "stationId": stationid,
-        "endTime": date
+        "deviceSn": deviceSn
     })
     headers = {
         'Content-Type': 'application/json',
         'Authorization': "bearer " + token
     }
-    conn.request("POST", "//station/v1.0/history?language=en", payload, headers)
+    conn.request("POST", "//device/v1.0/currentData?language=en", payload, headers)
     res = conn.getresponse()
     data = json.loads(res.read())
-    kwh = data["stationDataItems"][0]["generationValue"]
-    if isinstance(kwh, float):
-        return kwh
-    logging.error("Unable to get kWh")
-    sys.exit(1)
+    return data
 
+def restruct_and_separate_currentData(data):
+    dataList = data["dataList"]
+    newdataList = {}
+    for i in dataList:
+        del i["key"]
+        name = i["name"]
+        del i["name"]
+        newdataList[name] = i
+    del data["dataList"]
+    return newdataList
 
 def single_run(file):
     """
@@ -122,12 +110,27 @@ def single_run(file):
                         config["username"],
                         config["passhash"]
                       )
-    _t = time.strftime("%Y-%m-%d %H:%M:%S")
-    _w = get_power_realtime(config["url"], config["stationId"], token)
-    _kw = get_energy_today(config["url"], config["stationId"], token)
-    mqtt.message(config["mqtt"], "solar/power", _w)
-    mqtt.message(config["mqtt"], "solar/energy", _kw)
-    logging.info("%s - %s kWH day total and currently %s W", _t, _kw, _w)
+    #_t = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    stationData = get_station_realtime(config["url"], config["stationId"], token)
+    inverterData = get_device_currentData(config["url"], config["inverterId"] , token)
+    loggerData = get_device_currentData(config["url"], config["loggerId"] , token)
+
+    inverterDataList = restruct_and_separate_currentData(inverterData)
+    loggerDataList = restruct_and_separate_currentData(loggerData)
+    
+    for p in stationData:
+        mqtt.message(config["mqtt"], "solarmanpv/station/" + p, stationData[p])
+
+    for p in inverterData:
+        mqtt.message(config["mqtt"], "solarmanpv/inverter/" + p, inverterData[p])
+    mqtt.message(config["mqtt"], "solarmanpv/inverter/attributes", json.dumps(inverterDataList))
+
+    for p in loggerData:
+        mqtt.message(config["mqtt"], "solarmanpv/logger/" + p, loggerData[p])
+    mqtt.message(config["mqtt"], "solarmanpv/logger/attributes", json.dumps(loggerDataList))
+
+    logging.info(json.dumps(stationData, indent=4, sort_keys=True))
 
 
 def daemon(file, interval):
@@ -161,7 +164,7 @@ def main():
                         action="store_true",
                         help="single run and exit")
     parser.add_argument("-i", "--interval",
-                        default="300",
+                        default="60",
                         help="run interval in seconds (default 300 sec.)")
     parser.add_argument("-f", "--file",
                         default="config.json",

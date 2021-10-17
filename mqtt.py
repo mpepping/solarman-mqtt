@@ -50,4 +50,4 @@ def message(config, topic, msg):
     :param msg: Message payload
     """
     client = connect_mqtt(config["broker"], config["port"], config["username"], config["password"])
-    publish(client, topic, msg)
+    publish(client, topic , msg)

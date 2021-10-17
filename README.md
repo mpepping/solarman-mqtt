@@ -163,66 +163,6 @@ template:
 
 ```
 
-### Templates
-
-```
-template:
-  - sensor:
-    - name: solarmanpv_inverter_dc_voltage_pv1
-      unit_of_measurement: 'V'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_dc_current_pv1
-      unit_of_measurement: 'A'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV1') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_dc_power_pv1
-      unit_of_measurement: 'W'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_total_production_1
-      unit_of_measurement: 'kWh'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Total_Production_1') }}"
-      state_class: total_increasing
-      
-  - sensor:
-    - name: solarmanpv_inverter_daily_production_1
-      unit_of_measurement: 'kWh'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Daily_Production_1') }}"
-      state_class: total_increasing
-
-  - sensor:
-    - name: solarmanpv_inverter_ac_radiator_temp
-      unit_of_measurement: '°C'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Radiator_Temp') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_ac_voltage_1
-      unit_of_measurement: 'V'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_1') }}"
-      state_class: measurement
-      
-  - sensor:
-    - name: solarmanpv_inverter_ac_current_1
-      unit_of_measurement: 'A'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Current_1') }}"
-      state_class: measurement
-
-  - sensor:
-    - name: solarmanpv_inverter_ac_output_frequency_1
-      unit_of_measurement: 'Hz'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Output_Frequency_1') }}"
-      state_class: measurement
-
-```
-
 ### Screenshot
 
 ![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot.png "Screenshot")

@@ -119,16 +119,21 @@ def single_run(file):
 
     inverterDataList = restruct_and_separate_currentData(inverterData)
     loggerDataList = restruct_and_separate_currentData(loggerData)
+
+    discard = ["code", "msg", "requestId", "success"]
     
     for p in stationData:
-        mqtt.message(config["mqtt"], "solarmanpv/station/" + p, stationData[p])
+        if p not in discard:
+            mqtt.message(config["mqtt"], "solarmanpv/station/" + p, stationData[p])
 
     for p in inverterData:
-        mqtt.message(config["mqtt"], "solarmanpv/inverter/" + p, inverterData[p])
+        if p not in discard:
+            mqtt.message(config["mqtt"], "solarmanpv/inverter/" + p, inverterData[p])
     mqtt.message(config["mqtt"], "solarmanpv/inverter/attributes", json.dumps(inverterDataList))
 
     for p in loggerData:
-        mqtt.message(config["mqtt"], "solarmanpv/logger/" + p, loggerData[p])
+        if p not in discard:
+            mqtt.message(config["mqtt"], "solarmanpv/logger/" + p, loggerData[p])
     mqtt.message(config["mqtt"], "solarmanpv/logger/attributes", json.dumps(loggerDataList))
 
     logging.info(json.dumps(stationData, indent=4, sort_keys=True))

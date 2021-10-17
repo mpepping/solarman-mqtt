@@ -131,7 +131,7 @@ def single_run(file):
     for p in inverterData:
         if p not in discard:
             mqtt.message(config["mqtt"], topic+"/inverter/" + p, inverterData[p])
-    mqtt.message(config["mqtt"], "/inverter/attributes", json.dumps(inverterDataList))
+    mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverterDataList))
 
     for p in loggerData:
         if p not in discard:

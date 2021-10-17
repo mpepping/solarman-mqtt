@@ -56,7 +56,7 @@ solarmanpv/inverter/msg
 solarmanpv/inverter/requestId
 solarmanpv/inverter/success
 
-olarmanpv/inverter/attributes # contains all inverter datalist entries
+solarmanpv/inverter/attributes # contains all inverter datalist entries
 
 ```
 

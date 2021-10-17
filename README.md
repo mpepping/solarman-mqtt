@@ -22,6 +22,87 @@ optional arguments:
 
 You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>. 
 
+## MQTT topics
+
+### Station (Plant)
+
+```
+solarmanpv/station/batteryPower
+solarmanpv/station/batterySoc
+solarmanpv/station/chargePower
+solarmanpv/station/code
+solarmanpv/station/dischargePower
+solarmanpv/station/generationPower
+solarmanpv/station/gridPower
+solarmanpv/station/irradiateIntensit
+solarmanpv/station/lastUpdateTime
+solarmanpv/station/msg
+solarmanpv/station/purchasePower
+solarmanpv/station/requestId
+solarmanpv/station/success
+solarmanpv/station/usePower
+solarmanpv/station/wirePower
+```
+
+### Inverter
+
+```
+solarmanpv/inverter/code
+solarmanpv/inverter/deviceId
+solarmanpv/inverter/deviceSn
+solarmanpv/inverter/deviceState
+solarmanpv/inverter/deviceType
+solarmanpv/inverter/msg
+solarmanpv/inverter/requestId
+solarmanpv/inverter/success
+
+olarmanpv/inverter/attributes # contains all inverter datalist entries
+
+```
+
+### Logger (Collector)
+
+```
+solarmanpv/logger/code
+solarmanpv/logger/deviceId
+solarmanpv/logger/deviceSn
+solarmanpv/logger/deviceState
+solarmanpv/logger/deviceType
+solarmanpv/logger/msg
+solarmanpv/logger/requestId
+solarmanpv/logger/success
+
+solarmanpv/logger/attributes # contains all logger datalist entries
+```
+
+## Home Assistant
+```
+sensor:
+  - platform: mqtt
+    name: "solarmanpv_station_generationPower"
+    state_topic: "solarmanpv/station/generationPower"
+    unit_of_measurement: "W"
+    state_class: measurement
+```
+
+Repeat for every station topic needed. 
+
+```
+sensor:
+  - platform: mqtt
+    name: "solarmanpv_inverter"
+    state_topic: "solarmanpv/inverter/deviceState"
+    json_attributes_topic: "solarmanpv/inverter/attributes"
+    
+  - platform: mqtt
+    name: "solarmanpv_logger"
+    state_topic: "solarmanpv/logger/deviceState"
+    json_attributes_topic: "solarmanpv/logger/attributes"
+```
+
+Extract inverter and logger attributes as usual by means of e.g. templates.
+
+# Docker Usage has not been updated yet for this fork. However, Dockerfile in this repo should work. 
 
 ### Using Docker
 

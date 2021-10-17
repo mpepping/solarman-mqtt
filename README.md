@@ -30,16 +30,12 @@ You can run this script as a Docker container or in Python 3. Either way a confi
 solarmanpv/station/batteryPower
 solarmanpv/station/batterySoc
 solarmanpv/station/chargePower
-solarmanpv/station/code
 solarmanpv/station/dischargePower
 solarmanpv/station/generationPower
 solarmanpv/station/gridPower
 solarmanpv/station/irradiateIntensity
 solarmanpv/station/lastUpdateTime
-solarmanpv/station/msg
 solarmanpv/station/purchasePower
-solarmanpv/station/requestId
-solarmanpv/station/success
 solarmanpv/station/usePower
 solarmanpv/station/wirePower
 ```
@@ -47,14 +43,10 @@ solarmanpv/station/wirePower
 ### Inverter
 
 ```
-solarmanpv/inverter/code
 solarmanpv/inverter/deviceId
 solarmanpv/inverter/deviceSn
 solarmanpv/inverter/deviceState
 solarmanpv/inverter/deviceType
-solarmanpv/inverter/msg
-solarmanpv/inverter/requestId
-solarmanpv/inverter/success
 
 solarmanpv/inverter/attributes # contains all inverter datalist entries.
 ```
@@ -68,14 +60,10 @@ Micro Inverter Port 4, Number Of MPPT Paths, Number Of Phases, Running Status, O
 ### Logger (Collector)
 
 ```
-solarmanpv/logger/code
 solarmanpv/logger/deviceId
 solarmanpv/logger/deviceSn
 solarmanpv/logger/deviceState
 solarmanpv/logger/deviceType
-solarmanpv/logger/msg
-solarmanpv/logger/requestId
-solarmanpv/logger/success
 
 solarmanpv/logger/attributes # contains all logger datalist entries
 ```

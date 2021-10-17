@@ -119,8 +119,6 @@ def single_run(file):
 
     inverterDataList = restruct_and_separate_currentData(inverterData)
     loggerDataList = restruct_and_separate_currentData(loggerData)
-
-    print(json.dumps(inverterDataList, indent=4, sort_keys=True))
     
     for p in stationData:
         mqtt.message(config["mqtt"], "solarmanpv/station/" + p, stationData[p])

@@ -34,7 +34,7 @@ solarmanpv/station/code
 solarmanpv/station/dischargePower
 solarmanpv/station/generationPower
 solarmanpv/station/gridPower
-solarmanpv/station/irradiateIntensit
+solarmanpv/station/irradiateIntensity
 solarmanpv/station/lastUpdateTime
 solarmanpv/station/msg
 solarmanpv/station/purchasePower

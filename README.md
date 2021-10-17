@@ -235,6 +235,10 @@ template:
 
 ```
 
+### Screenshot
+
+![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot.png "Screenshot")
+
 # Docker Usage has not been updated yet for this fork. However, Dockerfile in this repo should work. 
 
 ### Using Docker

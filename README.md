@@ -3,8 +3,6 @@
 Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example is the Trannergy PV converter.
 
 ```lang=bash
-podman run -ti --rm ghcr.io/mpepping/solarman-mqtt:latest -h
-
 usage: run.py [-h] [-d] [-s] [-i INTERVAL] [-f FILE] [-v]
 
 Collect data from Trannergy / Solarman API
@@ -237,14 +235,17 @@ template:
 ![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot.png "Screenshot")
 ![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot_haenergy.png "Screenshot")
 
-# Docker Usage has not been updated yet for this fork. However, Dockerfile in this repo should work. 
-
 ### Using Docker
 
 Docker example to run this script every 5 minutes and providing a config file:
 
-`docker run -ti --rm -v $PWD/config.json:/opt/app-root/src ghcr.io/mpepping/solarman-mqtt:latest`
-
+```lang=bash
+cd /opt
+git clone https://github.com/lechk82/solarman-mqtt
+cd solarman-mqtt
+mv config.sample.json config.json # setup your config
+sudo docker run --name solarman-mqtt -d -v /opt/solarman-mqtt:/opt/app-root/src ghcr.io/lechk82/solarman-mqtt:latest
+```
 
 ### Using docker-compose
 
@@ -255,12 +256,12 @@ version: '3'
 
 services:
   solarman-mqtt:
-    image: ghcr.io/mpepping/solarman-mqtt:latest
+    image: ghcr.io/lechk82/solarman-mqtt:latest
     container_name: "solarman-mqtt"
     environment:
-    - TZ=Europe/Amsterdam
+    - TZ=Europe/Berlin
     volumes:
-      - ./config.json:/opt/app-root/src/config.json
+      - /opt/solarman-mqtt:/opt/app-root/src/config.json
     restart: always
 ```
 

@@ -6,3 +6,4 @@
 # Project
 *.pyc
 config.json
+venv/

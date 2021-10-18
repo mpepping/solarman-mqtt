@@ -17,20 +17,31 @@ logging.basicConfig(level=logging.INFO)
 def load_config(file):
     """
     Load configuration
-    :return:
+    :return: Configuration object
     """
-    with open(file, "r", encoding="utf-8") as config_file:
-        config = json.load(config_file)
-        return config
+    try:
+        with open(file, "r", encoding="utf-8") as config_file:
+            config = json.load(config_file)
+            return config
+    except (FileNotFoundError, PermissionError) as error:
+        logging.info("%s - Unable to open config file: %s", timestamp(), str(error))
+        sys.exit(1)
 
 
 def today():
     """
-    Return date in YYYY-MM-DD
-    :return:
+    :return: Returns the date in YYYY-MM-DD format
     """
     date = time.strftime("%Y-%m-%d")
     return date
+
+
+def timestamp():
+    """
+    :return: Timestamp in YY-MM-DD hh:mm:ss
+    """
+    _t = time.strftime("%Y-%m-%d %H:%M:%S")
+    return _t
 
 
 def get_token(url, appid, secret, username, passhash):
@@ -54,15 +65,15 @@ def get_token(url, appid, secret, username, passhash):
         data = json.loads(res.read())
         logging.debug("Received token")
         return data["access_token"]
-    except Exception as error:  # pylint: disable=broad-except
-        logging.error("Unable to fetch token: %s", str(error))
+    except (KeyError, TypeError) as error:
+        logging.error("%s - Unable to fetch token: %s", timestamp(), str(error))
         sys.exit(1)
 
 
 def get_power_realtime(url, stationid, token):
     """
     Return current energy usage in W
-    :return:
+    :return: watts
     """
     conn = http.client.HTTPSConnection(url)
     payload = json.dumps({
@@ -78,14 +89,14 @@ def get_power_realtime(url, stationid, token):
     watts = data["generationPower"]
     if isinstance(watts, float):
         return watts
-    logging.error("Unable to get watts")
+    logging.error("%s - Unable to get watts", timestamp())
     sys.exit(1)
 
 
 def get_energy_today(url, stationid, token):
     """
-    Return today usage in kW
-    :return:
+    Return today usage in kWh
+    :return: kilowatts/hour
     """
     date = today()
     conn = http.client.HTTPSConnection(url)
@@ -105,14 +116,14 @@ def get_energy_today(url, stationid, token):
     kwh = data["stationDataItems"][0]["generationValue"]
     if isinstance(kwh, float):
         return kwh
-    logging.error("Unable to get kWh")
+    logging.error("%s - Unable to get kWh", timestamp())
     sys.exit(1)
 
 
 def single_run(file):
     """
     Output current watts and kilowatts
-    :return:
+    :param file: Config file
     """
     config = load_config(file)
     token = get_token(
@@ -122,12 +133,11 @@ def single_run(file):
                         config["username"],
                         config["passhash"]
                       )
-    _t = time.strftime("%Y-%m-%d %H:%M:%S")
     _w = get_power_realtime(config["url"], config["stationId"], token)
     _kw = get_energy_today(config["url"], config["stationId"], token)
     mqtt.message(config["mqtt"], "solar/power", _w)
     mqtt.message(config["mqtt"], "solar/energy", _kw)
-    logging.info("%s - %s kWH day total and currently %s W", _t, _kw, _w)
+    logging.info("%s - %s kWH day total and currently %s W", timestamp(), _kw, _w)
 
 
 def daemon(file, interval):
@@ -135,7 +145,6 @@ def daemon(file, interval):
     Run as a daemon process
     :param file: Config file
     :param interval: Run interval in seconds
-    :return:
     """
     interval = int(interval)
     logging.info("Starting daemonized with a %s seconds run interval", str(interval))
@@ -143,9 +152,15 @@ def daemon(file, interval):
         try:
             single_run(file)
             time.sleep(interval)
-        except Exception as error:  # pylint: disable=broad-except
-            logging.error("Error on start: %s", str(error))
+        except ValueError as error:
+            logging.error("%s - Configuration error: %s ", timestamp(), str(error))
             sys.exit(1)
+        except KeyboardInterrupt:
+            logging.error("%s - Caught interrupt", timestamp())
+            sys.exit(1)
+        # except Exception as error:  # pylint: disable=broad-except
+        #     logging.error("%s - Error on start: %s", timestamp(), str(error))
+        #     sys.exit(1)
 
 
 def main():

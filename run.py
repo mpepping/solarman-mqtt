@@ -134,9 +134,9 @@ def single_run(file):
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
     inverterDeviceState = inverterData["deviceState"]
     #if diff_timestamp < config["maxAge"]:
-    if inverterDeviceState == 4:
-        #logging.info("local and remote timestamp diff: %s seconds -> Publishing MQTT...",diff_timestamp)
-        logging.info("Inverter DeviceState: %s -> Publishing MQTT...", inverterDeviceState)
+    if inverterDeviceState == 1:
+        #logging.info("%s - local and remote timestamp diff: %s seconds -> Publishing MQTT...",_t ,diff_timestamp)
+        logging.info("%s - Inverter DeviceState: %s -> Publishing MQTT...",_t, inverterDeviceState)
         for p in stationData:
             if p not in discard:
                 mqtt.message(config["mqtt"], topic+"/station/" + p, stationData[p])
@@ -151,7 +151,7 @@ def single_run(file):
                 mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
         mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
     else:
-        logging.info("Inverter DeviceState: %s -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown", inverterDeviceState)
+        logging.info("%s - Inverter DeviceState: %s -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)", _t, inverterDeviceState)
         #logging.info("%s - local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",_t, diff_timestamp)
 
 

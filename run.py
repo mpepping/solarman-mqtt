@@ -8,7 +8,7 @@ import json
 import logging
 import sys
 import time
-
+from datetime import datetime, timedelta, timezone
 import mqtt
 
 logging.basicConfig(level=logging.INFO)
@@ -111,7 +111,6 @@ def single_run(file):
                         config["username"],
                         config["passhash"]
                       )
-    #_t = time.strftime("%Y-%m-%d %H:%M:%S")
 
     stationData = get_station_realtime(config["url"], config["stationId"], token)
     inverterData = get_device_currentData(config["url"], config["inverterId"] , token)
@@ -127,10 +126,12 @@ def single_run(file):
         logging.info(json.dumps(loggerData, indent=4, sort_keys=True))
         logging.info(json.dumps(loggerDataList, indent=4, sort_keys=True))
 
-
     discard = ["code", "msg", "requestId", "success"]
     topic = config["mqtt"]["topic"]
-    diff_timestamp = round((time.time()) - round(stationData["lastUpdateTime"]))
+
+    d = datetime.utcnow()
+    diff_timestamp = int(d.strftime("%s")) - int(stationData["lastUpdateTime"])
+    _t = time.strftime("%Y-%m-%d %H:%M:%S")
 
     if diff_timestamp < config["maxAge"]:
         logging.info("local and remote timestamp diff: %s seconds -> Publishing MQTT...",diff_timestamp)
@@ -148,7 +149,7 @@ def single_run(file):
                 mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
         mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
     else:
-        logging.info("local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",diff_timestamp)
+        logging.info("%s - local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",_t, diff_timestamp)
 
 
 def daemon(file, interval):

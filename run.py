@@ -133,7 +133,7 @@ def single_run(file):
     diff_timestamp = int(d.strftime("%s")) - int(stationData["lastUpdateTime"])
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
     inverterDeviceState = inverterData["deviceState"]
-    
+
     #if diff_timestamp < config["maxAge"]:
     if inverterDeviceState == 1:
         #logging.info("%s - local and remote timestamp diff: %s seconds -> Publishing MQTT...",_t ,diff_timestamp)
@@ -189,7 +189,7 @@ def main():
                         action="store_true",
                         help="single run and exit")
     parser.add_argument("-i", "--interval",
-                        default="60",
+                        default="300",
                         help="run interval in seconds (default 300 sec.)")
     parser.add_argument("-f", "--file",
                         default="config.json",

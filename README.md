@@ -163,6 +163,31 @@ sensor:
     name: "solarmanpv_logger"
     state_topic: "solarmanpv/logger/deviceState"
     json_attributes_topic: "solarmanpv/logger/attributes"
+
+  - platform: template
+    sensors:
+      solarmanpv_inverter_device_state:
+        entity_id: sensor.solarmanpv_inverter
+        value_template: >-
+          {% set mapper =  {
+              '1' : 'Online',
+              '2' : 'Failure',
+              '3' : 'Offline'} %}
+          {% set state =  states.sensor.solarmanpv_inverter.state %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+         
+  - platform: template
+    sensors:
+      solarmanpv_logger_device_state:
+        entity_id: sensor.solarmanpv_logger
+        value_template: >-
+          {% set mapper =  {
+              '1' : 'Online',
+              '2' : 'Failure',
+              '3' : 'Offline'} %}
+          {% set state =  states.sensor.solarmanpv_logger.state %}
+          {{ mapper[state] if state in mapper else 'Unknown' }}
+
 ```
 
 ### Templates
@@ -170,10 +195,10 @@ sensor:
 ```
 template:
   - sensor:
-      - name: solarmanpv_inverter_dc_voltage_pv1
-        unit_of_measurement: 'V'
-        state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
-        state_class: measurement
+    - name: solarmanpv_inverter_dc_voltage_pv1
+      unit_of_measurement: 'V'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
+      state_class: measurement
   - sensor:
     - name: solarmanpv_inverter_dc_current_pv1
       unit_of_measurement: 'A'

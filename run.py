@@ -151,7 +151,9 @@ def single_run(file):
                 mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
         mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
     else:
-        logging.info("%s - Inverter DeviceState: %s -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)", _t, inverterDeviceState)
+        mqtt.message(config["mqtt"], topic+"/inverter/deviceState", inverterData["deviceState"])
+        mqtt.message(config["mqtt"], topic+"/logger/deviceState", loggerData["deviceState"])
+        logging.info("%s - Inverter DeviceState: %s -> Only status MQTT publish (probably offline due to nighttime shutdown)", _t, inverterDeviceState)
         #logging.info("%s - local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",_t, diff_timestamp)
 
 

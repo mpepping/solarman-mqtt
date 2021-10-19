@@ -120,25 +120,35 @@ def single_run(file):
     inverterDataList = restruct_and_separate_currentData(inverterData)
     loggerDataList = restruct_and_separate_currentData(loggerData)
 
+    if config["debug"]:
+        logging.info(json.dumps(stationData, indent=4, sort_keys=True))
+        logging.info(json.dumps(inverterData, indent=4, sort_keys=True))
+        logging.info(json.dumps(inverterDataList, indent=4, sort_keys=True))
+        logging.info(json.dumps(loggerData, indent=4, sort_keys=True))
+        logging.info(json.dumps(loggerDataList, indent=4, sort_keys=True))
+
+
     discard = ["code", "msg", "requestId", "success"]
-
     topic = config["mqtt"]["topic"]
-    
-    for p in stationData:
-        if p not in discard:
-            mqtt.message(config["mqtt"], topic+"/station/" + p, stationData[p])
+    diff_timestamp = round((time.time()) - round(stationData["lastUpdateTime"]))
 
-    for p in inverterData:
-        if p not in discard:
-            mqtt.message(config["mqtt"], topic+"/inverter/" + p, inverterData[p])
-    mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverterDataList))
+    if diff_timestamp < config["maxAge"]:
+        logging.info("local and remote timestamp diff: %s seconds -> Publishing MQTT...",diff_timestamp)
+        for p in stationData:
+            if p not in discard:
+                mqtt.message(config["mqtt"], topic+"/station/" + p, stationData[p])
 
-    for p in loggerData:
-        if p not in discard:
-            mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
-    mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
+        for p in inverterData:
+            if p not in discard:
+                mqtt.message(config["mqtt"], topic+"/inverter/" + p, inverterData[p])
+        mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverterDataList))
 
-    logging.info(json.dumps(stationData, indent=4, sort_keys=True))
+        for p in loggerData:
+            if p not in discard:
+                mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
+        mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
+    else:
+        logging.info("local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",diff_timestamp)
 
 
 def daemon(file, interval):

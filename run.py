@@ -132,9 +132,11 @@ def single_run(file):
     d = datetime.utcnow()
     diff_timestamp = int(d.strftime("%s")) - int(stationData["lastUpdateTime"])
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
-
-    if diff_timestamp < config["maxAge"]:
-        logging.info("local and remote timestamp diff: %s seconds -> Publishing MQTT...",diff_timestamp)
+    inverterDeviceState = inverterData["deviceState"]
+    #if diff_timestamp < config["maxAge"]:
+    if inverterDeviceState == 4:
+        #logging.info("local and remote timestamp diff: %s seconds -> Publishing MQTT...",diff_timestamp)
+        logging.info("Inverter DeviceState: %s -> Publishing MQTT...", inverterDeviceState)
         for p in stationData:
             if p not in discard:
                 mqtt.message(config["mqtt"], topic+"/station/" + p, stationData[p])
@@ -149,7 +151,8 @@ def single_run(file):
                 mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
         mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
     else:
-        logging.info("%s - local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",_t, diff_timestamp)
+        logging.info("Inverter DeviceState: %s -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown", inverterDeviceState)
+        #logging.info("%s - local and remote timestamp diff: %s seconds -> NOT Publishing MQTT (Station probably offline due to nighttime shutdown)",_t, diff_timestamp)
 
 
 def daemon(file, interval):

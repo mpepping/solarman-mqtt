@@ -286,7 +286,7 @@ services:
     environment:
     - TZ=Europe/Berlin
     volumes:
-      - /opt/solarman-mqtt:/opt/app-root/src/config.json
+      - /opt/solarman-mqtt:/opt/app-root/src
     restart: unless-stopped
 ```
 

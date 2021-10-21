@@ -8,7 +8,6 @@ import json
 import logging
 import sys
 import time
-from datetime import datetime, timedelta, timezone
 import mqtt
 
 logging.basicConfig(level=logging.INFO)
@@ -59,6 +58,10 @@ def get_token(url, appid, secret, username, passhash):
         sys.exit(1)
 
 def get_station_realtime(url, stationid, token):
+    """
+    Return station realtime data
+    :return: realtime data
+    """
     conn = http.client.HTTPSConnection(url)
     payload = json.dumps({
         "stationId": stationid
@@ -72,10 +75,14 @@ def get_station_realtime(url, stationid, token):
     data = json.loads(res.read())
     return data
 
-def get_device_currentData(url, deviceSn, token):
+def get_device_current_data(url, device_sn, token):
+    """
+    Return device current data
+    :return: current data
+    """
     conn = http.client.HTTPSConnection(url)
     payload = json.dumps({
-        "deviceSn": deviceSn
+        "deviceSn": device_sn
     })
     headers = {
         'Content-Type': 'application/json',
@@ -86,17 +93,22 @@ def get_device_currentData(url, deviceSn, token):
     data = json.loads(res.read())
     return data
 
-def restruct_and_separate_currentData(data):
-    dataList = data["dataList"]
-    newdataList = {}
-    for i in dataList:
+def restruct_and_separate_current_data(data):
+    """
+    Return restructured and separated device current data
+    Original data is removed
+    :return: new current data
+    """
+    data_list = data["dataList"]
+    new_data_list = {}
+    for i in data_list:
         del i["key"]
         name = i["name"]
         name = name.replace(" ", "_")
         del i["name"]
-        newdataList[name] = i["value"]
+        new_data_list[name] = i["value"]
     del data["dataList"]
-    return newdataList
+    return new_data_list
 
 def single_run(file):
     """
@@ -105,52 +117,55 @@ def single_run(file):
     """
     config = load_config(file)
     token = get_token(
-                        config["url"],
-                        config["appid"],
-                        config["secret"],
-                        config["username"],
-                        config["passhash"]
-                      )
+        config["url"],
+        config["appid"],
+        config["secret"],
+        config["username"],
+        config["passhash"]
+    )
 
-    stationData = get_station_realtime(config["url"], config["stationId"], token)
-    inverterData = get_device_currentData(config["url"], config["inverterId"] , token)
-    loggerData = get_device_currentData(config["url"], config["loggerId"] , token)
+    station_data = get_station_realtime(config["url"], config["stationId"], token)
+    inverter_data = get_device_current_data(config["url"], config["inverterId"], token)
+    logger_data = get_device_current_data(config["url"], config["loggerId"], token)
 
-    inverterDataList = restruct_and_separate_currentData(inverterData)
-    loggerDataList = restruct_and_separate_currentData(loggerData)
+    inverter_data_list = restruct_and_separate_current_data(inverter_data)
+    logger_data_list = restruct_and_separate_current_data(logger_data)
 
     if config["debug"]:
-        logging.info(json.dumps(stationData, indent=4, sort_keys=True))
-        logging.info(json.dumps(inverterData, indent=4, sort_keys=True))
-        logging.info(json.dumps(inverterDataList, indent=4, sort_keys=True))
-        logging.info(json.dumps(loggerData, indent=4, sort_keys=True))
-        logging.info(json.dumps(loggerDataList, indent=4, sort_keys=True))
+        logging.info(json.dumps(station_data, indent=4, sort_keys=True))
+        logging.info(json.dumps(inverter_data, indent=4, sort_keys=True))
+        logging.info(json.dumps(inverter_data_list, indent=4, sort_keys=True))
+        logging.info(json.dumps(logger_data, indent=4, sort_keys=True))
+        logging.info(json.dumps(logger_data_list, indent=4, sort_keys=True))
 
     discard = ["code", "msg", "requestId", "success"]
     topic = config["mqtt"]["topic"]
 
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
-    inverterDeviceState = inverterData["deviceState"]
+    inverter_device_state = inverter_data["deviceState"]
 
-    if inverterDeviceState == 1:
-        logging.info("%s - Inverter DeviceState: %s -> Publishing MQTT...",_t, inverterDeviceState)
-        for p in stationData:
-            if p not in discard:
-                mqtt.message(config["mqtt"], topic+"/station/" + p, stationData[p])
+    if inverter_device_state == 1:
+        logging.info("%s - Inverter DeviceState: %s -> Publishing MQTT...",
+                     _t, inverter_device_state)
+        for i in station_data:
+            if i not in discard:
+                mqtt.message(config["mqtt"], topic+"/station/" + i, station_data[i])
 
-        for p in inverterData:
-            if p not in discard:
-                mqtt.message(config["mqtt"], topic+"/inverter/" + p, inverterData[p])
-        mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverterDataList))
+        for i in inverter_data:
+            if i not in discard:
+                mqtt.message(config["mqtt"], topic+"/inverter/" + i, inverter_data[i])
+        mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverter_data_list))
 
-        for p in loggerData:
-            if p not in discard:
-                mqtt.message(config["mqtt"], topic+"/logger/" + p, loggerData[p])
-        mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(loggerDataList))
+        for i in logger_data:
+            if i not in discard:
+                mqtt.message(config["mqtt"], topic+"/logger/" + i, logger_data[i])
+        mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(logger_data_list))
     else:
-        mqtt.message(config["mqtt"], topic+"/inverter/deviceState", inverterData["deviceState"])
-        mqtt.message(config["mqtt"], topic+"/logger/deviceState", loggerData["deviceState"])
-        logging.info("%s - Inverter DeviceState: %s -> Only status MQTT publish (probably offline due to nighttime shutdown)", _t, inverterDeviceState)
+        mqtt.message(config["mqtt"], topic+"/inverter/deviceState", inverter_data["deviceState"])
+        mqtt.message(config["mqtt"], topic+"/logger/deviceState", logger_data["deviceState"])
+        logging.info("%s - Inverter DeviceState: %s"
+                     "-> Only status MQTT publish (probably offline due to nighttime shutdown)",
+                     _t, inverter_device_state)
 
 def daemon(file, interval):
     """

@@ -24,7 +24,7 @@ You can run this script as a Docker container or in Python 3. Either way a confi
 
 ### Station (Plant)
 
-```
+```lang=text
 solarmanpv/station/batteryPower
 solarmanpv/station/batterySoc
 solarmanpv/station/chargePower
@@ -40,7 +40,7 @@ solarmanpv/station/wirePower
 
 ### Inverter
 
-```
+```lang=text
 solarmanpv/inverter/deviceId
 solarmanpv/inverter/deviceSn
 solarmanpv/inverter/deviceState
@@ -50,7 +50,8 @@ solarmanpv/inverter/attributes # contains all inverter datalist entries.
 ```
 
 #### Attributes: 
-```
+
+```lang=text
 SN: XXXXXXXXXX
 Device_Type: 4
 Production_Compliance_Type: 0
@@ -112,7 +113,7 @@ Start-up Self-checking Time: 60
 
 ### Logger (Collector)
 
-```
+```lang=text
 solarmanpv/logger/deviceId
 solarmanpv/logger/deviceSn
 solarmanpv/logger/deviceState
@@ -122,7 +123,8 @@ solarmanpv/logger/attributes # contains all logger datalist entries
 ```
 
 #### Attributes
-```
+
+```lang=text
 Embedded_Device_SN: XXXXXXXXXX
 Module_Version_No: MW3_15_5406_1.35
 Extended_System_Version: V1.1.00.07
@@ -141,7 +143,8 @@ Method_Of_Protocol_Upgrade: 255
 ```
 
 ## Home Assistant
-```
+
+```lang=text
 sensor:
   - platform: mqtt
     name: "solarmanpv_station_generationPower"
@@ -192,7 +195,7 @@ sensor:
 
 ### Templates
 
-```
+```lang=text
 template:
   - sensor:
     - name: solarmanpv_inverter_dc_voltage_pv1
@@ -257,8 +260,8 @@ template:
 
 ### Screenshot
 
-![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot.png "Screenshot")
-![Screenshot](https://github.com/lechk82/solarman-mqtt/raw/main/screenshot_haenergy.png "Screenshot")
+![Screenshot](https://github.com/mpepping/solarman-mqtt/raw/main/doc/images/screenshot.png "Screenshot")
+![Screenshot](https://github.com/mpepping/solarman-mqtt/raw/main/doc/images/screenshot_haenergy.png "Screenshot")
 
 ### Using Docker
 
@@ -266,10 +269,10 @@ Docker example to run this script every 5 minutes and providing a config file:
 
 ```lang=bash
 cd /opt
-git clone https://github.com/lechk82/solarman-mqtt
+git clone https://github.com/mpepping/solarman-mqtt
 cd solarman-mqtt
 mv config.sample.json config.json # setup your config
-sudo docker run --name solarman-mqtt -d --restart unless-stopped -v /opt/solarman-mqtt:/opt/app-root/src ghcr.io/lechk82/solarman-mqtt:latest
+sudo docker run --name solarman-mqtt -d --restart unless-stopped -v /opt/solarman-mqtt:/opt/app-root/src ghcr.io/mpepping/solarman-mqtt:latest
 ```
 
 ### Using docker-compose
@@ -281,7 +284,7 @@ version: '3'
 
 services:
   solarman-mqtt:
-    image: ghcr.io/lechk82/solarman-mqtt:latest
+    image: ghcr.io/mpepping/solarman-mqtt:latest
     container_name: "solarman-mqtt"
     environment:
     - TZ=Europe/Berlin

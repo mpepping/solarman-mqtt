@@ -1,7 +1,7 @@
 FROM registry.access.redhat.com/ubi8/python-38:1-68
 
-LABEL maintainer "Martijn Pepping <martijn.pepping@automiq.nl>"
-LABEL org.opencontainers.image.source https://github.com/mpepping/solarman-mqtt
+LABEL maintainer "forked from Martijn Pepping <martijn.pepping@automiq.nl>"
+LABEL org.opencontainers.image.source https://github.com/lechk82/solarman-mqtt
 
 ADD . /opt/app-root/src/ 
 

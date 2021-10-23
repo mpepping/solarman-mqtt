@@ -6,9 +6,13 @@
   "username": "",
   "passhash": "",
   "stationId": 123,
+  "inverterId": 456,
+  "loggerId": 789,
+  "debug" : false,
   "mqtt":{
     "broker": "1.1.1.1",
     "port": 1883,
+    "topic": "solarmanpv",
     "username": "",
     "password": ""
   }

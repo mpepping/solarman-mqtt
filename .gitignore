@@ -2,6 +2,7 @@
 *swp
 .idea
 *.iml
+.vscode
 
 # Project
 *.pyc

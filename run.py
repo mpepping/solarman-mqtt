@@ -8,10 +8,12 @@ import json
 import logging
 import sys
 import time
+
+# local imports
 import mqtt
+import helpers
 
 logging.basicConfig(level=logging.INFO)
-
 
 def load_config(file):
     """
@@ -21,7 +23,6 @@ def load_config(file):
     with open(file, "r", encoding="utf-8") as config_file:
         config = json.load(config_file)
         return config
-
 
 def today():
     """
@@ -110,12 +111,31 @@ def restruct_and_separate_current_data(data):
     del data["dataList"]
     return new_data_list
 
+def validate_config(file):
+    """
+    Validate config file
+    :param file: Config file
+    :return:
+    """
+    config = load_config(file)
+    helpers.check(config)
+
+def create_passhash(password):
+    """
+    Create passhash from password
+    :param password: Password
+    :return:
+    """
+    _hash = helpers.hash_password(password)
+    print(_hash)
+
 def single_run(file):
     """
     Output current watts and kilowatts
     :return:
     """
     config = load_config(file)
+
     token = get_token(
         config["url"],
         config["appid"],
@@ -146,7 +166,7 @@ def single_run(file):
 
     if inverter_device_state == 1:
         logging.info("%s - Inverter DeviceState: %s -> Publishing MQTT...",
-                     _t, inverter_device_state)
+                    _t, inverter_device_state)
         for i in station_data:
             if i not in discard:
                 mqtt.message(config["mqtt"], topic+"/station/" + i, station_data[i])
@@ -164,8 +184,8 @@ def single_run(file):
         mqtt.message(config["mqtt"], topic+"/inverter/deviceState", inverter_data["deviceState"])
         mqtt.message(config["mqtt"], topic+"/logger/deviceState", logger_data["deviceState"])
         logging.info("%s - Inverter DeviceState: %s"
-                     "-> Only status MQTT publish (probably offline due to nighttime shutdown)",
-                     _t, inverter_device_state)
+                    "-> Only status MQTT publish (probably offline due to nighttime shutdown)",
+                    _t, inverter_device_state)
 
 def daemon(file, interval):
     """
@@ -183,6 +203,9 @@ def daemon(file, interval):
         except Exception as error:  # pylint: disable=broad-except
             logging.error("Error on start: %s", str(error))
             sys.exit(1)
+        except KeyboardInterrupt:
+            logging.info("Exiting on keyboard interrupt")
+            sys.exit(0)
 
 
 def main():
@@ -203,14 +226,25 @@ def main():
     parser.add_argument("-f", "--file",
                         default="config.json",
                         help="config file (default ./config.json)")
+    parser.add_argument("--validate",
+                        action="store_true",
+                        help="validate config file and exit")
+    parser.add_argument("--create-passhash",
+                        default="",
+                        help="create passhash from provided passwordand exit")
     parser.add_argument("-v", "--version",
                         action='version',
-                        version='%(prog)s 0.0.1')
+                        version='solarman-mqqt (%(prog)s) 1.0.1')
+
     args = parser.parse_args()
-    if args.single:
-        single_run(args.file)
-    elif args.daemon:
+    if args.daemon:
         daemon(args.file, args.interval)
+    elif args.single:
+        single_run(args.file)
+    elif args.validate:
+        validate_config(args.file)
+    elif args.create_passhash:
+        create_passhash(args.create_passhash)
     else:
         parser.print_help(sys.stderr)
 

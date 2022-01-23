@@ -3,22 +3,111 @@
 Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example is the Trannergy PV converter.
 
 ```lang=bash
-usage: run.py [-h] [-d] [-s] [-i INTERVAL] [-f FILE] [-v]
+usage: run.py [-h] [-d] [-s] [-i INTERVAL] [-f FILE] [--validate] [--create-passhash CREATE_PASSHASH] [-v]
 
 Collect data from Trannergy / Solarman API
 
 optional arguments:
--h, --help                       show this help message and exit
--d, --daemon                     run as a service (default)
--s, --single                     single run and exit
--i INTERVAL, --interval INTERVAL run interval in seconds (default 300 sec.)
--f FILE, --file FILE             config file (default ./config.json)
--v, --version                    show program's version number and exit
+  -h, --help            show this help message and exit
+  -d, --daemon          run as a service
+  -s, --single          single run and exit
+  -i INTERVAL, --interval INTERVAL
+                        run interval in seconds (default 300 sec.)
+  -f FILE, --file FILE  config file (default ./config.json)
+  --validate            validate config file and exit
+  --create-passhash CREATE_PASSHASH
+                        create passhash from provided passwordand exit
+  -v, --version         show program's version number and exit
 ```
 
 ## Usage
 
-You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>. 
+You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>.
+
+## Were do I get te required information for the config file?
+
+Create a new config file by copying the sample file and filling in the required information.
+
+The first part covers your account:
+
+```lang=json
+{
+  "name": "Trannergy",
+  "url": "api.solarmanpv.com",
+  "appid": "",
+  "secret": "",
+  "username": "",
+  "passhash": "",
+}
+```
+
+* **name**: is free text to identify the platform.
+* **url**: is the base URL of the API.
+* **appid**: is the appid for the API (See Usage).
+* **secret**: is the secret for the API (See Usage).
+* **username**: is the username for the API (emailadres).
+* **passhash**: is a sha256 hash of your password. This can be generated via `--create-passhash`.
+
+The second part covers the PV inverter and logger ID's. These can be retrieved via the Solarman API.
+
+```lang=json
+{
+  "stationId": 123,
+  "inverterId": 456,
+  "loggerId": 789
+}
+```
+
+* **stationId**: is the ID of the station. This is the value of `stationList[0].id`.
+
+```lang=bash
+curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?language=en' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: bearer TOKEN' \
+--data-raw '{"size":20,"page":1}'
+```
+
+* **inverterId**: is the ID of the inverter. This is the value of `deviceListItems[0].deviceSn`
+
+```lang=bash
+curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: bearer TOKEN' \
+--data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"INVERTER"}'
+```
+
+* **loggerId**: is the ID of the logger. This is the value of `deviceListItems[0].deviceSn`.
+
+```lang=bash
+curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: bearer TOKEN' \
+--data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"COLLECTOR"}'
+```
+
+A bearer TOKEN to use in the requests above can be retrieved by adding your APPID, APPSECRET, USERNAME, PASSHASH in this request:
+
+```lang=bash
+curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?appId=APPID&language=en' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "appSecret": "APPSECRET",
+  "email": "USERNAME",
+  "password": "PASSHASH"
+}'
+```
+
+The final section covers the MQTT broker, to where the metrics will be published.
+
+```lang=json
+{
+  "broker": "mqtt.example.com",
+  "port": 1883,
+  "topic": "solarman",
+  "username": "",
+  "password": ""
+}
+```
 
 ## MQTT topics
 
@@ -49,7 +138,7 @@ solarmanpv/inverter/deviceType
 solarmanpv/inverter/attributes # contains all inverter datalist entries.
 ```
 
-#### Attributes: 
+#### Attributes:
 
 ```lang=text
 SN: XXXXXXXXXX
@@ -153,15 +242,15 @@ sensor:
     state_class: measurement
 ```
 
-Repeat for every station topic needed. 
+Repeat for every station topic needed.
 
-```
+```lang=yaml
 sensor:
   - platform: mqtt
     name: "solarmanpv_inverter"
     state_topic: "solarmanpv/inverter/deviceState"
     json_attributes_topic: "solarmanpv/inverter/attributes"
-    
+
   - platform: mqtt
     name: "solarmanpv_logger"
     state_topic: "solarmanpv/logger/deviceState"
@@ -178,7 +267,7 @@ sensor:
               '3' : 'Offline'} %}
           {% set state =  states.sensor.solarmanpv_inverter.state %}
           {{ mapper[state] if state in mapper else 'Unknown' }}
-         
+
   - platform: template
     sensors:
       solarmanpv_logger_device_state:
@@ -190,12 +279,11 @@ sensor:
               '3' : 'Offline'} %}
           {% set state =  states.sensor.solarmanpv_logger.state %}
           {{ mapper[state] if state in mapper else 'Unknown' }}
-
 ```
 
 ### Templates
 
-```lang=text
+```lang=yaml
 template:
   - sensor:
     - name: solarmanpv_inverter_dc_voltage_pv1
@@ -207,25 +295,25 @@ template:
       unit_of_measurement: 'A'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV1') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_dc_power_pv1
       unit_of_measurement: 'W'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_dc_power_pv1
       unit_of_measurement: 'W'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_total_production_1
       unit_of_measurement: 'kWh'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'Total_Production_1') }}"
       state_class: total_increasing
-      
+
   - sensor:
     - name: solarmanpv_inverter_daily_production_1
       unit_of_measurement: 'kWh'
@@ -237,13 +325,13 @@ template:
       unit_of_measurement: '°C'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Radiator_Temp') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_ac_voltage_1
       unit_of_measurement: 'V'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_1') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_ac_current_1
       unit_of_measurement: 'A'
@@ -262,6 +350,10 @@ template:
 
 ![Screenshot](https://github.com/mpepping/solarman-mqtt/raw/main/doc/images/screenshot.png "Screenshot")
 ![Screenshot](https://github.com/mpepping/solarman-mqtt/raw/main/doc/images/screenshot_haenergy.png "Screenshot")
+
+## Running
+
+The easiest way to run is via a container. Current version is available at <https://github.com/mpepping/solarman-mqtt/pkgs/container/solarman-mqtt>
 
 ### Using Docker
 
@@ -296,4 +388,3 @@ services:
 ### Using Python
 
 Run `pip install -r requirements.txt` and start `python3 run.py`.
-

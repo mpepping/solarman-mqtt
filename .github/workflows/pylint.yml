@@ -2,6 +2,10 @@ name: Pylint
 
 on:
   push:
+    branches:
+      - '!main'
+    tags:
+      - '!v*.*.*'
 
 jobs:
   tests:

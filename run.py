@@ -100,15 +100,16 @@ def restruct_and_separate_current_data(data):
     Original data is removed
     :return: new current data
     """
-    data_list = data["dataList"]
     new_data_list = {}
-    for i in data_list:
-        del i["key"]
-        name = i["name"]
-        name = name.replace(" ", "_")
-        del i["name"]
-        new_data_list[name] = i["value"]
-    del data["dataList"]
+    if data["dataList"]:
+        data_list = data["dataList"]
+        for i in data_list:
+            del i["key"]
+            name = i["name"]
+            name = name.replace(" ", "_")
+            del i["name"]
+            new_data_list[name] = i["value"]
+        del data["dataList"]
     return new_data_list
 
 def validate_config(file):
@@ -135,7 +136,6 @@ def single_run(file):
     :return:
     """
     config = load_config(file)
-
     token = get_token(
         config["url"],
         config["appid"],
@@ -165,21 +165,24 @@ def single_run(file):
     inverter_device_state = inverter_data["deviceState"]
 
     if inverter_device_state == 1:
-        logging.info("%s - Inverter DeviceState: %s -> Publishing MQTT...",
+        logging.info("%s - Inverter DeviceState: %s -> Publishing to MQTT ...",
                     _t, inverter_device_state)
         for i in station_data:
-            if i not in discard:
+            if station_data[i] and i not in discard:
                 mqtt.message(config["mqtt"], topic+"/station/" + i, station_data[i])
 
         for i in inverter_data:
-            if i not in discard:
+            if inverter_data[i] and i not in discard:
                 mqtt.message(config["mqtt"], topic+"/inverter/" + i, inverter_data[i])
-        mqtt.message(config["mqtt"], topic+"/inverter/attributes", json.dumps(inverter_data_list))
+        if inverter_data_list:
+            mqtt.message(config["mqtt"], topic+"/inverter/attributes",
+                        json.dumps(inverter_data_list))
 
         for i in logger_data:
-            if i not in discard:
+            if logger_data[i] and i not in discard:
                 mqtt.message(config["mqtt"], topic+"/logger/" + i, logger_data[i])
-        mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(logger_data_list))
+        if logger_data_list:
+            mqtt.message(config["mqtt"], topic+"/logger/attributes", json.dumps(logger_data_list))
     else:
         mqtt.message(config["mqtt"], topic+"/inverter/deviceState", inverter_data["deviceState"])
         mqtt.message(config["mqtt"], topic+"/logger/deviceState", logger_data["deviceState"])
@@ -231,16 +234,16 @@ def main():
                         help="validate config file and exit")
     parser.add_argument("--create-passhash",
                         default="",
-                        help="create passhash from provided passwordand exit")
+                        help="create passhash from provided password string and exit")
     parser.add_argument("-v", "--version",
                         action='version',
                         version='solarman-mqqt (%(prog)s) 1.0.1')
 
     args = parser.parse_args()
-    if args.daemon:
-        daemon(args.file, args.interval)
-    elif args.single:
+    if args.single:
         single_run(args.file)
+    elif args.daemon:
+        daemon(args.file, args.interval)
     elif args.validate:
         validate_config(args.file)
     elif args.create_passhash:

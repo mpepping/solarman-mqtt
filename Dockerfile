@@ -1,14 +1,17 @@
-FROM registry.access.redhat.com/ubi8/python-38:1-68
+FROM python:3.10-slim-bullseye
 
 LABEL maintainer "Martijn Pepping <martijn.pepping@automiq.nl>"
 LABEL org.opencontainers.image.source https://github.com/mpepping/solarman-mqtt
 
-ADD . /opt/app-root/src/ 
+ADD . /opt/app/src/
+WORKDIR /opt/app/src
 
-RUN pip install -U "pip>=19.3.1" && \ 
+RUN python3 -m venv /opt/venv && \
+    . /opt/venv/bin/activate && \
+    pip install --upgrade pip && \
     pip install -r requirements.txt
 
-WORKDIR /opt/app-root/src
+ENV PATH=/opt/venv/bin:$PATH
 
 ENTRYPOINT ["python", "run.py"]
 CMD ["-d"]

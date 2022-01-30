@@ -22,13 +22,13 @@ optional arguments:
 
 ## Usage
 
-You can run this script as a Docker container or in Python 3. Either way a configuration file is required. See the sample `config.sample.json` file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via <mailto:service@solarmanpv.com>.
+You can run this script as a Docker container or in Python 3. Either way, a configuration file is required. Use the sample [config.sample.json](config.sample.json) file in this repository for reference. Also, a Solarman API appid+secret is required, which can be requested via [service@solarmanpv.com](mailto:service@solarmanpv.com?subject=SolarmanPV%20API%20key%20Request).
 
-## Were do I get te required information for the config file?
+## How to get all required input for the config file
 
-Create a new config file by copying the sample file and filling in the required information.
+Create a new config file by copying the [sample config file](config.sample.json) and filling in the required information.
 
-The first part covers your account:
+The first part covers your SolarmanPV account:
 
 ```lang=json
 {
@@ -38,6 +38,7 @@ The first part covers your account:
   "secret": "",
   "username": "",
   "passhash": "",
+  [..]
 }
 ```
 
@@ -52,9 +53,11 @@ The second part covers the PV inverter and logger ID's. These can be retrieved v
 
 ```lang=json
 {
+  [..]
   "stationId": 123,
   "inverterId": 456,
   "loggerId": 789
+  [..]
 }
 ```
 
@@ -62,35 +65,35 @@ The second part covers the PV inverter and logger ID's. These can be retrieved v
 
 ```lang=bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?language=en' \
---header 'Content-Type: application/json' \
---header 'Authorization: bearer TOKEN' \
---data-raw '{"size":20,"page":1}'
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: bearer TOKEN' \
+  --data-raw '{"size":20,"page":1}'
 ```
 
 * **inverterId**: is the ID of the inverter. This is the value of `deviceListItems[0].deviceSn`
 
 ```lang=bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
---header 'Content-Type: application/json' \
---header 'Authorization: bearer TOKEN' \
---data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"INVERTER"}'
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: bearer TOKEN' \
+  --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"INVERTER"}'
 ```
 
 * **loggerId**: is the ID of the logger. This is the value of `deviceListItems[0].deviceSn`.
 
 ```lang=bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
---header 'Content-Type: application/json' \
---header 'Authorization: bearer TOKEN' \
---data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"COLLECTOR"}'
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: bearer TOKEN' \
+  --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"COLLECTOR"}'
 ```
 
 A bearer TOKEN to use in the requests above can be retrieved by adding your APPID, APPSECRET, USERNAME, PASSHASH in this request:
 
 ```lang=bash
 curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?appId=APPID&language=en' \
---header 'Content-Type: application/json' \
---data-raw '{
+  --header 'Content-Type: application/json' \
+  --data-raw '{
   "appSecret": "APPSECRET",
   "email": "USERNAME",
   "password": "PASSHASH"
@@ -101,6 +104,7 @@ The final section covers the MQTT broker, to where the metrics will be published
 
 ```lang=json
 {
+  [..]
   "broker": "mqtt.example.com",
   "port": 1883,
   "topic": "solarman",
@@ -111,7 +115,11 @@ The final section covers the MQTT broker, to where the metrics will be published
 
 ## MQTT topics
 
+The following topics are published to the MQTT broker. Topics and fields may differ between PV system types. The example output below use `solarmanpv` as the topic, configured in the config file.
+
 ### Station (Plant)
+
+Information about the plant, current power and last update time.
 
 ```lang=text
 solarmanpv/station/batteryPower
@@ -129,16 +137,17 @@ solarmanpv/station/wirePower
 
 ### Inverter
 
+Inverter information.
+
 ```lang=text
 solarmanpv/inverter/deviceId
 solarmanpv/inverter/deviceSn
 solarmanpv/inverter/deviceState
 solarmanpv/inverter/deviceType
-
-solarmanpv/inverter/attributes # contains all inverter datalist entries.
+solarmanpv/inverter/attributes
 ```
 
-#### Attributes:
+The `attributes` field contains all inverter datalist entries as a JSON object. An expample set of attributes is shown below:
 
 ```lang=text
 SN: XXXXXXXXXX
@@ -207,13 +216,13 @@ solarmanpv/logger/deviceId
 solarmanpv/logger/deviceSn
 solarmanpv/logger/deviceState
 solarmanpv/logger/deviceType
-
-solarmanpv/logger/attributes # contains all logger datalist entries
+solarmanpv/logger/attributes 
 ```
 
-#### Attributes
+The `attributes` field contains all inverter datalist entries as a JSON object.  Some devices may send an empty object for this field.
+An expample set of attributes is shown below:
 
-```lang=text
+```lang=bash
 Embedded_Device_SN: XXXXXXXXXX
 Module_Version_No: MW3_15_5406_1.35
 Extended_System_Version: V1.1.00.07
@@ -259,7 +268,6 @@ sensor:
   - platform: template
     sensors:
       solarmanpv_inverter_device_state:
-        entity_id: sensor.solarmanpv_inverter
         value_template: >-
           {% set mapper =  {
               '1' : 'Online',
@@ -271,7 +279,6 @@ sensor:
   - platform: template
     sensors:
       solarmanpv_logger_device_state:
-        entity_id: sensor.solarmanpv_logger
         value_template: >-
           {% set mapper =  {
               '1' : 'Online',
@@ -381,7 +388,7 @@ services:
     environment:
     - TZ=Europe/Berlin
     volumes:
-      - /opt/solarman-mqtt:/opt/app-root/src
+      - /opt/solarman-mqtt:/opt/app-root/src # source dir must contain you config file
     restart: unless-stopped
 ```
 

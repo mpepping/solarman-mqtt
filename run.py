@@ -9,9 +9,7 @@ import logging
 import sys
 import time
 
-# local imports
-import mqtt
-import helpers
+from solarman import helpers, mqtt
 
 logging.basicConfig(level=logging.INFO)
 
@@ -23,15 +21,6 @@ def load_config(file):
     with open(file, "r", encoding="utf-8") as config_file:
         config = json.load(config_file)
         return config
-
-def today():
-    """
-    Return date in YYYY-MM-DD
-    :return:
-    """
-    date = time.strftime("%Y-%m-%d")
-    return date
-
 
 def get_token(url, appid, secret, username, passhash):
     """

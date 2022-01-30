@@ -4,6 +4,7 @@ Validate the JSON schema and contents used for the config file.
 
 import hashlib
 import sys
+import time
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from jsonschema.exceptions import SchemaError
@@ -120,10 +121,8 @@ def check(config):
         print(err.message)
         sys.exit(1)
 
-
     print(VALID)
     sys.exit(0)
-
 
 def hash_password(password):
     """

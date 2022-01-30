@@ -8,7 +8,6 @@ from paho.mqtt import client as mqtt_client
 
 logging.basicConfig(level=logging.INFO)
 
-
 def connect_mqtt(broker, port, username, password):
     """
     Create an MQTT connection
@@ -23,7 +22,6 @@ def connect_mqtt(broker, port, username, password):
     client.username_pw_set(username, password)
     client.connect(broker, port)
     return client
-
 
 def publish(client, topic, msg):
     """
@@ -40,7 +38,6 @@ def publish(client, topic, msg):
         logging.debug("Send %s to %s", msg, topic)
     else:
         logging.error("Failed to send message to topic %s", topic)
-
 
 def message(config, topic, msg):
     """

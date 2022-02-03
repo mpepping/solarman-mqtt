@@ -220,7 +220,7 @@ solarmanpv/logger/attributes
 ```
 
 The `attributes` field contains all inverter datalist entries as a JSON object.  Some devices may send an empty object for this field.
-An expample set of attributes is shown below:
+An example set of attributes is shown below:
 
 ```lang=bash
 Embedded_Device_SN: XXXXXXXXXX
@@ -242,12 +242,14 @@ Method_Of_Protocol_Upgrade: 255
 
 ## Home Assistant
 
-```lang=text
+```lang=yaml
 sensor:
   - platform: mqtt
     name: "solarmanpv_station_generationPower"
     state_topic: "solarmanpv/station/generationPower"
-    unit_of_measurement: "W"
+    unique_id: "generatedPower"
+    unit_of_measurement: "Wh"
+    device_class: energy
     state_class: measurement
 ```
 
@@ -257,17 +259,20 @@ Repeat for every station topic needed.
 sensor:
   - platform: mqtt
     name: "solarmanpv_inverter"
+    unique_id: "solarmanpv_inverter"
     state_topic: "solarmanpv/inverter/deviceState"
     json_attributes_topic: "solarmanpv/inverter/attributes"
 
   - platform: mqtt
     name: "solarmanpv_logger"
+    unique_id: "solarmanpv_logger"
     state_topic: "solarmanpv/logger/deviceState"
     json_attributes_topic: "solarmanpv/logger/attributes"
 
   - platform: template
     sensors:
       solarmanpv_inverter_device_state:
+        unique_id: "inverter_device_state"
         value_template: >-
           {% set mapper =  {
               '1' : 'Online',
@@ -279,6 +284,7 @@ sensor:
   - platform: template
     sensors:
       solarmanpv_logger_device_state:
+        unique_id: "logger_device_state"
         value_template: >-
           {% set mapper =  {
               '1' : 'Online',
@@ -292,65 +298,138 @@ sensor:
 
 ```lang=yaml
 template:
+
+  - sensor:
+      - name: "Solarman energy daily"
+        unique_id: "solarman_energy_daily"
+        unit_of_measurement: 'kWh'
+        state: "{{ state_attr('sensor.solarmanpv_inverter', 'Daily_Production_(Active)') }}"
+        device_class: energy
+        state_class: measurement
+        attributes:
+          last_reset: '1970-01-01T00:00:00+00:00'
+
   - sensor:
     - name: solarmanpv_inverter_dc_voltage_pv1
+      unique_id: "solarmanpv_inverter_dc_voltage_pv1"
       unit_of_measurement: 'V'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
       state_class: measurement
+
   - sensor:
     - name: solarmanpv_inverter_dc_current_pv1
+      unique_id: "solarmanpv_inverter_dc_current_pv1"
       unit_of_measurement: 'A'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV1') }}"
       state_class: measurement
 
   - sensor:
-    - name: solarmanpv_inverter_dc_power_pv1
-      unit_of_measurement: 'W'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
+    - name: solarmanpv_inverter_dc_voltage_testing
+      unique_id: "solarmanpv_inverter_dc_current_testing"
+      unit_of_measurement: 'V'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV1') }}"
+      state_class: measurement
+      unit_of_measurement: 'A'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV1') }}"
       state_class: measurement
 
   - sensor:
-    - name: solarmanpv_inverter_dc_power_pv1
-      unit_of_measurement: 'W'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
+    - name: solarmanpv_inverter_dc_voltage_pv2
+      unique_id: " solarmanpv_inverter_dc_voltage_pv2"
+      unit_of_measurement: 'V'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Voltage_PV2') }}"
       state_class: measurement
 
   - sensor:
-    - name: solarmanpv_inverter_total_production_1
+    - name: solarmanpv_inverter_dc_current_pv2
+      unique_id: "solarmanpv_inverter_dc_current_pv2"
+      unit_of_measurement: 'A'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV2') }}"
+      state_class: measurement
+      
+  - sensor:
+    - name: solarmanpv_inverter_dc_power_pv1
+      unique_id: "solarmanpv_inverter_dc_power_pv1"
+      unit_of_measurement: 'W'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
+      state_class: measurement
+      
+  - sensor:
+    - name: solarmanpv_inverter_dc_power_pv2
+      unique_id: "solarmanpv_inverter_dc_power_pv2"
+      unit_of_measurement: 'W'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV2') }}"
+      state_class: measurement
+      
+  - sensor:
+    - name: solarmanpv_inverter_total_production
+      unique_id: "solarmanpv_inverter_total_production"
       unit_of_measurement: 'kWh'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Total_Production_1') }}"
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Cumulative_Production_(Active)') }}"
       state_class: total_increasing
-
+      
   - sensor:
-    - name: solarmanpv_inverter_daily_production_1
+    - name: solarmanpv_inverter_daily_production
+      unique_id: "solarmanpv_inverter_daily_production"
       unit_of_measurement: 'kWh'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Daily_Production_1') }}"
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Daily_Production_(Active)') }}"
       state_class: total_increasing
 
   - sensor:
     - name: solarmanpv_inverter_ac_radiator_temp
+      unique_id: "solarmanpv_inverter_ac_radiator_temp"
       unit_of_measurement: '°C'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Radiator_Temp') }}"
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'Temperature-_Inverter') }}"
       state_class: measurement
-
+      
   - sensor:
     - name: solarmanpv_inverter_ac_voltage_1
+      unique_id: "solarmanpv_inverter_ac_voltage_1"
       unit_of_measurement: 'V'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_1') }}"
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_R/U/A') }}"
       state_class: measurement
 
   - sensor:
     - name: solarmanpv_inverter_ac_current_1
+      unique_id: "solarmanpv_inverter_ac_current_1"
       unit_of_measurement: 'A'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Current_1') }}"
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Current_R/U/A') }}"
       state_class: measurement
 
   - sensor:
-    - name: solarmanpv_inverter_ac_output_frequency_1
-      unit_of_measurement: 'Hz'
-      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Output_Frequency_1') }}"
+    - name: solarmanpv_inverter_ac_voltage_2
+      unique_id: "solarmanpv_inverter_ac_volgage_2"
+      unit_of_measurement: 'V'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_S/V/B') }}"
       state_class: measurement
 
+  - sensor:
+    - name: solarmanpv_inverter_ac_current_2
+      unique_id: "solarmanpv_inverter_ac_current_2"
+      unit_of_measurement: 'A'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Current_S/V/B') }}"
+      state_class: measurement
+
+  - sensor:
+    - name: solarmanpv_inverter_ac_voltage_3
+      unique_id: "solarmanpv_inverter_ac_voltage_3"
+      unit_of_measurement: 'V'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Voltage_T/W/C') }}"
+      state_class: measurement
+
+  - sensor:
+    - name: solarmanpv_inverter_ac_current_3
+      unique_id: "solarmanpv_inverter_ac_current_3"
+      unit_of_measurement: 'A'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Current_T/W/C') }}"
+      state_class: measurement
+
+  - sensor:
+    - name: solarmanpv_inverter_ac_output_frequency
+      unique_id: "solarmanpv_inverter_ac_output_frequency"
+      unit_of_measurement: 'Hz'
+      state: "{{ state_attr('sensor.solarmanpv_inverter', 'AC_Output_Frequency_R') }}"
+      state_class: measurement
 ```
 
 ### Screenshot

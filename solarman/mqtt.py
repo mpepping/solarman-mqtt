@@ -8,6 +8,7 @@ from paho.mqtt import client as mqtt_client
 
 logging.basicConfig(level=logging.INFO)
 
+
 class Mqtt:
     """
     MQTT connect and publish
@@ -30,7 +31,7 @@ class Mqtt:
         Create an MQTT connection
         :return:
         """
-        client_id = f'solarmanpv-mqtt-{random.randint(0, 1000)}'
+        client_id = f"solarmanpv-mqtt-{random.randint(0, 1000)}"
         client = mqtt_client.Client(client_id)
         client.username_pw_set(self.username, self.password)
         client.connect(self.broker, self.port)

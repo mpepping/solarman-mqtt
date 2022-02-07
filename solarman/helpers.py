@@ -4,7 +4,6 @@ Validate the JSON schema and contents used for the config file.
 
 import hashlib
 import sys
-import time
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 from jsonschema.exceptions import SchemaError
@@ -106,29 +105,44 @@ If you need any further help, please see:
 <https://github.com/mpepping/solarman-mqtt>
 """
 
-def check(config):
+class ConfigCheck: # pylint: disable=too-few-public-methods
     """
-    Main
-    :return:
+    Validate the config file
     """
-    try:
-        # validate(instance=json.load(open(config)), schema=schema)
-        validate(instance=config, schema=schema)
-    except ValidationError as err:
-        print(err.message)
-        sys.exit(1)
-    except SchemaError as err:
-        print(err.message)
-        sys.exit(1)
 
-    print(VALID)
-    sys.exit(0)
+    def __init__(self, config):
+        """
+        Main
+        :return:
+        """
+        self.config = config
+        try:
+            # validate(instance=json.load(open(config)), schema=schema)
+            validate(instance=self.config, schema=schema)
+        except ValidationError as err:
+            print(err.message)
+            sys.exit(1)
+        except SchemaError as err:
+            print(err.message)
+            sys.exit(1)
 
-def hash_password(password):
+        print(VALID)
+        sys.exit(0)
+
+class HashPassword: # pylint: disable=too-few-public-methods
     """
     Hash the password
     """
-    encoded=password.encode('utf-8')
-    result = hashlib.sha256(encoded)
-    _hash = result.hexdigest()
-    return _hash
+
+    def __init__(self, password):
+        self.password = password
+        self.hashed = ''
+        HashPassword.hash(self)
+
+    def hash(self):
+        """
+        Return hashed string
+        :return:
+        """
+        self.hashed = hashlib.sha256(self.password.encode('utf-8')).hexdigest()
+        return self.hashed

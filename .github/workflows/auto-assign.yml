@@ -1,4 +1,5 @@
 name: 'Auto Assign'
+# yamllint disable-line rule:truthy
 on:
   pull_request:
     types: [opened, ready_for_review]

@@ -3,16 +3,18 @@ Collect PV data from the SolarmanPV API and send Power+Energy data to MQTT
 """
 
 import argparse
-import http.client
 import json
 import logging
 import sys
 import time
 
+from .api import SolarmanApi, ConstructData
 from .helpers import ConfigCheck, HashPassword
 from .mqtt import Mqtt
 
 logging.basicConfig(level=logging.INFO)
+
+VERSION = "1.0.0"
 
 
 def load_config(file):
@@ -23,75 +25,6 @@ def load_config(file):
     with open(file, "r", encoding="utf-8") as config_file:
         config = json.load(config_file)
         return config
-
-
-def get_token(url, appid, secret, username, passhash):
-    """
-    Get a token from the API
-    :return: access_token
-    """
-    try:
-        conn = http.client.HTTPSConnection(url)
-        payload = json.dumps(
-            {"appSecret": secret, "email": username, "password": passhash}
-        )
-        headers = {"Content-Type": "application/json"}
-        url = f"//account/v1.0/token?appId={appid}&language=en"
-        conn.request("POST", url, payload, headers)
-        res = conn.getresponse()
-        data = json.loads(res.read())
-        logging.debug("Received token")
-        return data["access_token"]
-    except Exception as error:  # pylint: disable=broad-except
-        logging.error("Unable to fetch token: %s", str(error))
-        sys.exit(1)
-
-
-def get_station_realtime(url, stationid, token):
-    """
-    Return station realtime data
-    :return: realtime data
-    """
-    conn = http.client.HTTPSConnection(url)
-    payload = json.dumps({"stationId": stationid})
-    headers = {"Content-Type": "application/json", "Authorization": "bearer " + token}
-    conn.request("POST", "//station/v1.0/realTime?language=en", payload, headers)
-    res = conn.getresponse()
-    data = json.loads(res.read())
-    return data
-
-
-def get_device_current_data(url, device_sn, token):
-    """
-    Return device current data
-    :return: current data
-    """
-    conn = http.client.HTTPSConnection(url)
-    payload = json.dumps({"deviceSn": device_sn})
-    headers = {"Content-Type": "application/json", "Authorization": "bearer " + token}
-    conn.request("POST", "//device/v1.0/currentData?language=en", payload, headers)
-    res = conn.getresponse()
-    data = json.loads(res.read())
-    return data
-
-
-def restruct_and_separate_current_data(data):
-    """
-    Return restructured and separated device current data
-    Original data is removed
-    :return: new current data
-    """
-    new_data_list = {}
-    if data["dataList"]:
-        data_list = data["dataList"]
-        for i in data_list:
-            del i["key"]
-            name = i["name"]
-            name = name.replace(" ", "_")
-            del i["name"]
-            new_data_list[name] = i["value"]
-        del data["dataList"]
-    return new_data_list
 
 
 def validate_config(file):
@@ -120,22 +53,16 @@ def single_run(file):
     :return:
     """
     config = load_config(file)
-    token = get_token(
-        config["url"],
-        config["appid"],
-        config["secret"],
-        config["username"],
-        config["passhash"],
-    )
+    pvdata = SolarmanApi(config)
 
-    station_data = get_station_realtime(config["url"], config["stationId"], token)
-    inverter_data = get_device_current_data(config["url"], config["inverterId"], token)
-    logger_data = get_device_current_data(config["url"], config["loggerId"], token)
+    station_data = pvdata.station_realtime
+    inverter_data = pvdata.device_current_data_inverter
+    logger_data = pvdata.device_current_data_logger
 
-    inverter_data_list = restruct_and_separate_current_data(inverter_data)
-    logger_data_list = restruct_and_separate_current_data(logger_data)
+    inverter_data_list = ConstructData(inverter_data).device_current_data
+    logger_data_list = ConstructData(logger_data).device_current_data
 
-    if config["debug"]:
+    if config.get("debug", False):
         logging.info(json.dumps(station_data, indent=4, sort_keys=True))
         logging.info(json.dumps(inverter_data, indent=4, sort_keys=True))
         logging.info(json.dumps(inverter_data_list, indent=4, sort_keys=True))
@@ -246,7 +173,10 @@ def main():
         help="create passhash from provided password string and exit",
     )
     parser.add_argument(
-        "-v", "--version", action="version", version="solarman-mqqt (%(prog)s) 1.0.1"
+        "-v",
+        "--version",
+        action="version",
+        version="solarman-mqtt (%(prog)s) " + VERSION,
     )
 
     args = parser.parse_args()

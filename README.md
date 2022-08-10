@@ -70,7 +70,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?la
   --data-raw '{"size":20,"page":1}'
 ```
 
-* **inverterId**: is the ID of the inverter. This is the value of `deviceListItems[0].deviceSn`.
+* **inverterId**: is the SN of the inverter. This is the value of `deviceListItems[0].deviceSn`.
 * For Bosswerk MI300 and MI600 use "MICRO_INVERTER" instead of "INVERTER".
 
 ```lang=bash
@@ -80,7 +80,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?
   --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"INVERTER"}'
 ```
 
-* **loggerId**: is the ID of the logger. This is the value of `deviceListItems[0].deviceSn`.
+* **loggerId**: is the SN of the logger. This is the value of `deviceListItems[0].deviceSn`.
 
 ```lang=bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \

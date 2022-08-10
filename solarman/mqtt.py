@@ -14,17 +14,15 @@ class Mqtt:
     MQTT connect and publish
     """
 
-    def __init__(self, config, topic, msg):
+    def __init__(self, config):
         """
-        MQTT Connect and send
+        MQTT Connect
         """
         self.broker = config["broker"]
         self.port = config["port"]
         self.username = config["username"]
         self.password = config["password"]
-        self.topic = topic
-        self.msg = msg
-        Mqtt.message(self)
+        self.client = Mqtt.connect(self)
 
     def connect(self):
         """
@@ -37,7 +35,7 @@ class Mqtt:
         client.connect(self.broker, self.port)
         return client
 
-    def publish(self, client):
+    def publish(self, client, topic, msg):
         """
         Publish a message on a MQTT topic
         :param client: Connect parameters
@@ -45,17 +43,16 @@ class Mqtt:
         :param msg: Message payload
         :return:
         """
-        result = client.publish(self.topic, self.msg)
+        result = client.publish(topic, msg)
         # result: [0, 1]
         status = result[0]
         if status == 0:
-            logging.debug("Send %s to %s", self.msg, self.topic)
+            logging.debug("Send %s to %s", msg, topic)
         else:
-            logging.error("Failed to send message to topic %s", self.topic)
+            logging.error("Failed to send message to topic %s", topic)
 
-    def message(self):
+    def message(self, topic, msg):
         """
-        MQTT Connect and send
+        MQTT Send message to selected topic
         """
-        client = Mqtt.connect(self)
-        Mqtt.publish(self, client)
+        Mqtt.publish(self, self.client, topic, msg)

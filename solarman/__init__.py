@@ -81,36 +81,36 @@ def single_run(file):
             _t,
             inverter_device_state,
         )
+        mqtt_connection = Mqtt(config["mqtt"])
         for i in station_data:
             if station_data[i] and i not in discard:
-                Mqtt(config["mqtt"], topic + "/station/" + i, station_data[i])
+                mqtt_connection.message(topic + "/station/" + i, station_data[i])
 
         for i in inverter_data:
             if inverter_data[i] and i not in discard:
-                Mqtt(config["mqtt"], topic + "/inverter/" + i, inverter_data[i])
+                mqtt_connection.message(topic + "/inverter/" + i, inverter_data[i])
         if inverter_data_list:
-            Mqtt(
-                config["mqtt"],
+            mqtt_connection.message(
                 topic + "/inverter/attributes",
                 json.dumps(inverter_data_list),
             )
 
         for i in logger_data:
             if logger_data[i] and i not in discard:
-                Mqtt(config["mqtt"], topic + "/logger/" + i, logger_data[i])
+                mqtt_connection.message(topic + "/logger/" + i, logger_data[i])
         if logger_data_list:
-            Mqtt(
-                config["mqtt"],
+            mqtt_connection.message(
                 topic + "/logger/attributes",
                 json.dumps(logger_data_list),
             )
     else:
-        Mqtt(
-            config["mqtt"],
+        mqtt_connection.message(
             topic + "/inverter/deviceState",
             inverter_data["deviceState"],
         )
-        Mqtt(config["mqtt"], topic + "/logger/deviceState", logger_data["deviceState"])
+        mqtt_connection.message(
+            topic + "/logger/deviceState", logger_data["deviceState"]
+        )
         logging.info(
             "%s - Inverter DeviceState: %s"
             "-> Only status MQTT publish (probably offline due to nighttime shutdown)",

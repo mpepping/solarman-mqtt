@@ -6,7 +6,7 @@
   "username": "",
   "passhash": "",
   "stationId": 123,
-  "inverterId": 456,
+  "inverterId": "dev456",
   "loggerId": 789,
   "debug" : false,
   "mqtt":{

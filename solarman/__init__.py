@@ -81,7 +81,7 @@ def single_run(file):
             _t,
             inverter_device_state,
         )
-        mqtt_connection = Mqtt(config["mqtt"]);
+        mqtt_connection = Mqtt(config["mqtt"])
         for i in station_data:
             if station_data[i] and i not in discard:
                 mqtt_connection.message(topic + "/station/" + i, station_data[i])
@@ -108,7 +108,9 @@ def single_run(file):
             topic + "/inverter/deviceState",
             inverter_data["deviceState"],
         )
-        mqtt_connection.message(topic + "/logger/deviceState", logger_data["deviceState"])
+        mqtt_connection.message(
+            topic + "/logger/deviceState", logger_data["deviceState"]
+        )
         logging.info(
             "%s - Inverter DeviceState: %s"
             "-> Only status MQTT publish (probably offline due to nighttime shutdown)",

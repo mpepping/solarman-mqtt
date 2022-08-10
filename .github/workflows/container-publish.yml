@@ -32,7 +32,7 @@ jobs:
         pip install pylint paho_mqtt jsonschema
     - name: Analysing the code with pylint
       run: |
-        pylint `ls -R|grep .py$|xargs`
+        pylint -r yes run.py solarman
 
   build:
     runs-on: ubuntu-latest

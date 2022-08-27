@@ -74,6 +74,7 @@ def single_run(file):
 
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
     inverter_device_state = inverter_data["deviceState"]
+    mqtt_connection = Mqtt(config["mqtt"])
 
     if inverter_device_state == 1:
         logging.info(
@@ -81,7 +82,6 @@ def single_run(file):
             _t,
             inverter_device_state,
         )
-        mqtt_connection = Mqtt(config["mqtt"])
         for i in station_data:
             if station_data[i] and i not in discard:
                 mqtt_connection.message(topic + "/station/" + i, station_data[i])

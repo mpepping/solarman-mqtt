@@ -35,7 +35,7 @@ class Mqtt:
         client.connect(self.broker, self.port)
         return client
 
-    def publish(self, client, topic, msg):
+    def publish(self, client, topic, msg): # pylint: disable=no-self-use
         """
         Publish a message on a MQTT topic
         :param client: Connect parameters

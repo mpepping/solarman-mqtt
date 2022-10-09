@@ -101,7 +101,7 @@ class ConstructData:  # pylint: disable=too-few-public-methods
         Return restructured and separated device current data
         """
         new_data_list = {}
-        if self.data["dataList"]:
+        try:
             for i in self.data["dataList"]:
                 del i["key"]
                 name = i["name"]
@@ -109,4 +109,6 @@ class ConstructData:  # pylint: disable=too-few-public-methods
                 del i["name"]
                 new_data_list[name] = i["value"]
             del self.data["dataList"]
+        except KeyError:
+            pass
         return new_data_list

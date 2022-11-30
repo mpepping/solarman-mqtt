@@ -468,7 +468,7 @@ services:
     environment:
     - TZ=Europe/Berlin
     volumes:
-      - /opt/solarman-mqtt:/opt/app-root/src # source dir must contain you config file
+      - /opt/solarman-mqtt/config.json:/opt/app-root/src/config.json # source dir must contain you config file
     restart: unless-stopped
 ```
 

@@ -14,7 +14,9 @@
     "port": 1883,
     "topic": "solarmanpv",
     "username": "",
-    "password": ""
+    "password": "",
+    "qos": 1,
+    "retain": true
   }
 }
 

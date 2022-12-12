@@ -22,6 +22,8 @@ class Mqtt:
         self.port = config["port"]
         self.username = config["username"]
         self.password = config["password"]
+        self.qos = config["qos"]
+        self.retain = config["retain"]
         self.client = Mqtt.connect(self)
 
     def connect(self):
@@ -43,7 +45,7 @@ class Mqtt:
         :param msg: Message payload
         :return:
         """
-        result = client.publish(topic, msg, qos=1, retain=True)
+        result = client.publish(topic, msg, self.qos, self.retain)
         # result: [0, 1]
         status = result[0]
         if status == 0:

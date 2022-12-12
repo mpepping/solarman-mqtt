@@ -43,7 +43,7 @@ class Mqtt:
         :param msg: Message payload
         :return:
         """
-        result = client.publish(topic, msg)
+        result = client.publish(topic, msg, qos=1, retain=True)
         # result: [0, 1]
         status = result[0]
         if status == 0:

@@ -37,7 +37,7 @@ class SolarmanApi:
         :return: access_token
         """
         try:
-            conn = http.client.HTTPSConnection(self.url)
+            conn = http.client.HTTPSConnection(self.url, timeout=60)
             payload = json.dumps(
                 {"appSecret": secret, "email": username, "password": passhash}
             )
@@ -57,7 +57,7 @@ class SolarmanApi:
         Return station realtime data
         :return: realtime data
         """
-        conn = http.client.HTTPSConnection(self.url)
+        conn = http.client.HTTPSConnection(self.url, timeout=60)
         payload = json.dumps({"stationId": self.station_id})
         headers = {
             "Content-Type": "application/json",
@@ -73,7 +73,7 @@ class SolarmanApi:
         Return device current data
         :return: current data
         """
-        conn = http.client.HTTPSConnection(self.url)
+        conn = http.client.HTTPSConnection(self.url, timeout=60)
         payload = json.dumps({"deviceSn": device_sn})
         headers = {
             "Content-Type": "application/json",

@@ -1,13 +1,13 @@
 {
   "name": "Trannergy",
   "url": "api.solarmanpv.com",
-  "appid": "",
-  "secret": "",
-  "username": "",
-  "passhash": "",
-  "stationId": 123,
-  "inverterId": "dev456",
-  "loggerId": 789,
+  "appid": "123456789013245",
+  "secret": "12345678901234567890123456789012",
+  "username": "email-address OR username",
+  "passhash": "1234567890123456789012345678901234567890123456789012345678901234",
+  "stationId": 1234567,
+  "inverterId": "1234567890",
+  "loggerId": "1234567890",
   "debug" : false,
   "mqtt":{
     "broker": "1.1.1.1",
@@ -19,4 +19,3 @@
     "retain": true
   }
 }
-

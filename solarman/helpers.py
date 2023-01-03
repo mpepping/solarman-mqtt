@@ -44,6 +44,8 @@ _SCHEMA = {
                 "topic": {"type": "string"},
                 "username": {"type": "string"},
                 "password": {"type": "string"},
+                "qos": {"type": "integer", "minimum": 1, "maximum": 1},
+                "retain": {"type": "boolean"},
             },
         },
     },

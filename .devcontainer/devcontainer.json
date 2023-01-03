@@ -22,9 +22,10 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"github.copilot",
+				"github.vscode-pull-request-github",
 				"ms-python.python",
-				"oderwat.indent-rainbow",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"oderwat.indent-rainbow"
 			]
 		}
 	},

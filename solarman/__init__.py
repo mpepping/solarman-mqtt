@@ -63,10 +63,15 @@ def single_run(file):
     logger_data_list = ConstructData(logger_data).device_current_data
 
     if config.get("debug", False):
+        logging.info(json.dumps("STATION DATA"))
         logging.info(json.dumps(station_data, indent=4, sort_keys=True))
+        logging.info(json.dumps("INVERTER DATA"))
         logging.info(json.dumps(inverter_data, indent=4, sort_keys=True))
+        logging.info(json.dumps("INVERTER DATA LIST"))
         logging.info(json.dumps(inverter_data_list, indent=4, sort_keys=True))
+        logging.info(json.dumps("LOGGER DATA"))
         logging.info(json.dumps(logger_data, indent=4, sort_keys=True))
+        logging.info(json.dumps("LOGGER DATA LIST"))
         logging.info(json.dumps(logger_data_list, indent=4, sort_keys=True))
 
     discard = ["code", "msg", "requestId", "success"]
@@ -93,23 +98,25 @@ def single_run(file):
         for i in inverter_data:
             if inverter_data[i] and i not in discard:
                 mqtt_connection.message(topic + "/inverter/" + i, inverter_data[i])
-        if inverter_data_list:
-            mqtt_connection.message(
-                topic + "/inverter/attributes",
-                json.dumps(inverter_data_list),
-            )
+
+        mqtt_connection.message(
+            topic + "/inverter/attributes",
+            json.dumps(inverter_data_list),
+        )
 
         for i in logger_data:
             if logger_data[i] and i not in discard:
                 mqtt_connection.message(topic + "/logger/" + i, logger_data[i])
-        if logger_data_list:
-            mqtt_connection.message(
-                topic + "/logger/attributes",
-                json.dumps(logger_data_list),
-            )
+
+        mqtt_connection.message(
+            topic + "/logger/attributes",
+            json.dumps(logger_data_list),
+        )
+
     elif inverter_device_state == 128:
         logging.info(
-            "%s - Inverter DeviceState: %s -> No valid inverter status data available",
+            "%s - Inverter DeviceState: %s"
+            "-> No valid inverter status data available",
             _t,
             inverter_device_state,
         )

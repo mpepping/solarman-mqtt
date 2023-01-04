@@ -73,7 +73,11 @@ def single_run(file):
     topic = config["mqtt"]["topic"]
 
     _t = time.strftime("%Y-%m-%d %H:%M:%S")
-    inverter_device_state = inverter_data["deviceState"]
+    try:
+        inverter_device_state = inverter_data["deviceState"]
+    except KeyError:
+        inverter_device_state = 128
+
     mqtt_connection = Mqtt(config["mqtt"])
 
     if inverter_device_state == 1:
@@ -103,6 +107,12 @@ def single_run(file):
                 topic + "/logger/attributes",
                 json.dumps(logger_data_list),
             )
+    elif inverter_device_state == 128:
+        logging.info(
+            "%s - Inverter DeviceState: %s -> No valid inverter status data available",
+            _t,
+            inverter_device_state,
+        )
     else:
         mqtt_connection.message(
             topic + "/inverter/deviceState",

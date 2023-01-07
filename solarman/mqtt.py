@@ -22,8 +22,8 @@ class Mqtt:
         self.port = config["port"]
         self.username = config["username"]
         self.password = config["password"]
-        self.qos = config.get("qos", 1)
-        self.retain = config.get("retain", True)
+        self.qos = config.get("qos", 0)
+        self.retain = config.get("retain", False)
         self.client = Mqtt.connect(self)
 
     def connect(self):

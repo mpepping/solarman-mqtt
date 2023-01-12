@@ -2,7 +2,7 @@
 
 Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example is the Trannergy PV converter.
 
-```lang=bash
+```bash
 usage: run.py [-h] [-d] [-s] [-i INTERVAL] [-f FILE] [--validate] [--create-passhash CREATE_PASSHASH] [-v]
 
 Collect data from Trannergy / Solarman API
@@ -30,7 +30,7 @@ Create a new config file by copying the [sample config file](config.sample.json)
 
 The first part covers your SolarmanPV account:
 
-```lang=json
+```json
 {
   "name": "Trannergy",
   "url": "api.solarmanpv.com",
@@ -51,7 +51,7 @@ The first part covers your SolarmanPV account:
 
 The second part covers the PV inverter and logger ID's. These can be retrieved via the Solarman API.
 
-```lang=json
+```json
 {
   [..]
   "stationId": 123,
@@ -63,7 +63,7 @@ The second part covers the PV inverter and logger ID's. These can be retrieved v
 
 * **stationId**: is the ID of the station. This is the value of `stationList[0].id`.
 
-```lang=bash
+```bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
@@ -73,7 +73,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?la
 * **inverterId**: is the SN of the inverter. This is the value of `deviceListItems[0].deviceSn`.
 * For Bosswerk MI300 and MI600 use "MICRO_INVERTER" instead of "INVERTER".
 
-```lang=bash
+```bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
@@ -82,7 +82,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?
 
 * **loggerId**: is the SN of the logger. This is the value of `deviceListItems[0].deviceSn`.
 
-```lang=bash
+```bash
 curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
@@ -91,7 +91,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?
 
 A bearer TOKEN to use in the requests above can be retrieved by adding your APPID, APPSECRET, USERNAME, PASSHASH in this request:
 
-```lang=bash
+```bash
 curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?appId=APPID&language=en' \
   --header 'Content-Type: application/json' \
   --data-raw '{
@@ -103,7 +103,7 @@ curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?a
 
 The final section covers the MQTT broker, to where the metrics will be published.
 
-```lang=json
+```json
 {
   [..]
   "broker": "mqtt.example.com",
@@ -122,7 +122,7 @@ The following topics are published to the MQTT broker. Topics and fields may dif
 
 Information about the plant, current power and last update time.
 
-```lang=text
+```text
 solarmanpv/station/batteryPower
 solarmanpv/station/batterySoc
 solarmanpv/station/chargePower
@@ -140,7 +140,7 @@ solarmanpv/station/wirePower
 
 Inverter information.
 
-```lang=text
+```text
 solarmanpv/inverter/deviceId
 solarmanpv/inverter/deviceSn
 solarmanpv/inverter/deviceState
@@ -150,7 +150,7 @@ solarmanpv/inverter/attributes
 
 The `attributes` field contains all inverter datalist entries as a JSON object. An expample set of attributes is shown below:
 
-```lang=text
+```text
 SN: XXXXXXXXXX
 Device_Type: 4
 Production_Compliance_Type: 0
@@ -212,7 +212,7 @@ Start-up Self-checking Time: 60
 
 ### Logger (Collector)
 
-```lang=text
+```text
 solarmanpv/logger/deviceId
 solarmanpv/logger/deviceSn
 solarmanpv/logger/deviceState
@@ -223,7 +223,7 @@ solarmanpv/logger/attributes
 The `attributes` field contains all inverter datalist entries as a JSON object.  Some devices may send an empty object for this field.
 An example set of attributes is shown below:
 
-```lang=bash
+```bash
 Embedded_Device_SN: XXXXXXXXXX
 Module_Version_No: MW3_15_5406_1.35
 Extended_System_Version: V1.1.00.07
@@ -243,7 +243,7 @@ Method_Of_Protocol_Upgrade: 255
 
 ## Home Assistant
 
-```lang=yaml
+```yaml
 sensor:
   - platform: mqtt
     name: "solarmanpv_station_generationPower"
@@ -256,7 +256,7 @@ sensor:
 
 Repeat for every station topic needed.
 
-```lang=yaml
+```yaml
 sensor:
   - platform: mqtt
     name: "solarmanpv_inverter"
@@ -297,7 +297,7 @@ sensor:
 
 ### Templates
 
-```lang=yaml
+```yaml
 template:
 
   - sensor:
@@ -446,7 +446,7 @@ The easiest way to run is via a container. Current version is available at <http
 
 Docker example to run this script every 5 minutes and providing a config file:
 
-```lang=bash
+```bash
 cd /opt
 git clone https://github.com/mpepping/solarman-mqtt
 cd solarman-mqtt
@@ -458,7 +458,7 @@ sudo docker run --name solarman-mqtt -d --restart unless-stopped -v /opt/solarma
 
 This `docker-compose.yml` example can be used with docker-compose or podman-compose
 
-```lang=yaml
+```yaml
 version: '3'
 
 services:

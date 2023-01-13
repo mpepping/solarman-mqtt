@@ -28,7 +28,7 @@ _SCHEMA = {
             "type": "string",
         },
         "url": {"type": "string"},
-        "appid": {"type": "string", "minLength": 15, "maxLength": 15},
+        "appid": {"type": "string", "minLength": 15, "maxLength": 16},
         "secret": {"type": "string", "minLength": 32, "maxLength": 32},
         "username": {"type": "string"},
         "passhash": {"type": "string", "minLength": 64, "maxLength": 64},

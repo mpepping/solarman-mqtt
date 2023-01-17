@@ -29,7 +29,7 @@
 			]
 		}
 	},
-	"postCreateCommand": "pip install black jsonschema paho_mqtt pylint && sudo -n apt update && sudo -n apt install git -y",
+	"postCreateCommand": "pip install black flake8 jsonschema paho_mqtt pylint && sudo -n apt update && sudo -n apt install git -y",
 
 	// https://www.kenmuse.com/blog/avoiding-dubious-ownership-in-dev-containers/
 	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}"

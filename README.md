@@ -101,6 +101,8 @@ curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?a
 }'
 ```
 
+**Note:** If there is an error with `AUTH_INVALID_USERNAME_OR_PASSWORD` as code it might be that your password is too long or contains special characters. Try something shorter and A-Z, a-z and 0-9 only.
+
 The final section covers the MQTT broker, to where the metrics will be published.
 
 ```json

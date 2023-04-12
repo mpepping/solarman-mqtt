@@ -1,6 +1,6 @@
 {
   "name": "Trannergy",
-  "url": "api.solarmanpv.com",
+  "url": "globalapi.solarmanpv.com",
   "appid": "123456789013245",
   "secret": "12345678901234567890123456789012",
   "username": "email-address OR username",

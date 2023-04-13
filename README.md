@@ -33,7 +33,7 @@ The first part covers your SolarmanPV account:
 ```json
 {
   "name": "Trannergy",
-  "url": "api.solarmanpv.com",
+  "url": "globalapi.solarmanpv.com",
   "appid": "",
   "secret": "",
   "username": "",
@@ -64,7 +64,7 @@ The second part covers the PV inverter and logger ID's. These can be retrieved v
 * **stationId**: is the ID of the station. This is the value of `stationList[0].id`.
 
 ```bash
-curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?language=en' \
+curl --location --request POST 'https://globalapi.solarmanpv.com/station/v1.0/list?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
   --data-raw '{"size":20,"page":1}'
@@ -74,7 +74,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/list?la
 * For Bosswerk MI300 and MI600 use "MICRO_INVERTER" instead of "INVERTER".
 
 ```bash
-curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
+curl --location --request POST 'https://globalapi.solarmanpv.com/station/v1.0/device?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
   --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"INVERTER"}'
@@ -83,7 +83,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?
 * **loggerId**: is the SN of the logger. This is the value of `deviceListItems[0].deviceSn`.
 
 ```bash
-curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?language=en' \
+curl --location --request POST 'https://globalapi.solarmanpv.com/station/v1.0/device?language=en' \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer TOKEN' \
   --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"COLLECTOR"}'
@@ -92,7 +92,7 @@ curl --location --request POST 'https://api.solarmanpv.com//station/v1.0/device?
 A bearer TOKEN to use in the requests above can be retrieved by adding your APPID, APPSECRET, USERNAME, PASSHASH in this request:
 
 ```bash
-curl --location --request POST 'https://api.solarmanpv.com//account/v1.0/token?appId=APPID&language=en' \
+curl --location --request POST 'https://globalapi.solarmanpv.com/account/v1.0/token?appId=APPID&language=en' \
   --header 'Content-Type: application/json' \
   --data-raw '{
   "appSecret": "APPSECRET",
@@ -219,7 +219,7 @@ solarmanpv/logger/deviceId
 solarmanpv/logger/deviceSn
 solarmanpv/logger/deviceState
 solarmanpv/logger/deviceType
-solarmanpv/logger/attributes 
+solarmanpv/logger/attributes
 ```
 
 The `attributes` field contains all inverter datalist entries as a JSON object.  Some devices may send an empty object for this field.
@@ -349,28 +349,28 @@ template:
       unit_of_measurement: 'A'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Current_PV2') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_dc_power_pv1
       unique_id: "solarmanpv_inverter_dc_power_pv1"
       unit_of_measurement: 'W'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV1') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_dc_power_pv2
       unique_id: "solarmanpv_inverter_dc_power_pv2"
       unit_of_measurement: 'W'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'DC_Power_PV2') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_total_production
       unique_id: "solarmanpv_inverter_total_production"
       unit_of_measurement: 'kWh'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'Cumulative_Production_(Active)') }}"
       state_class: total_increasing
-      
+
   - sensor:
     - name: solarmanpv_inverter_daily_production
       unique_id: "solarmanpv_inverter_daily_production"
@@ -384,7 +384,7 @@ template:
       unit_of_measurement: '°C'
       state: "{{ state_attr('sensor.solarmanpv_inverter', 'Temperature-_Inverter') }}"
       state_class: measurement
-      
+
   - sensor:
     - name: solarmanpv_inverter_ac_voltage_1
       unique_id: "solarmanpv_inverter_ac_voltage_1"

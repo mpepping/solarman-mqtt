@@ -32,7 +32,7 @@ _SCHEMA = {
         "secret": {"type": "string", "minLength": 32, "maxLength": 32},
         "username": {"type": "string"},
         "passhash": {"type": "string", "minLength": 64, "maxLength": 64},
-        "stationId": {"type": "number", "minimum": 100000, "maximum": 9999999},
+        "stationId": {"type": "number", "minimum": 100000, "maximum": 999999999},
         "inverterId": {"type": "string", "minLength": 10},
         "loggerId": {"type": "string", "minLength": 10, "maxLength": 10},
         "debug": {"type": "boolean", "optional": True},

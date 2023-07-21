@@ -17,7 +17,6 @@ optional arguments:
   --validate            validate config file and exit
   --create-passhash CREATE_PASSHASH
                         create passhash from provided passwordand exit
-  -v, --version         show program's version number and exit
 ```
 
 ## Usage

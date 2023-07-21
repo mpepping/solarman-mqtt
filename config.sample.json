@@ -8,7 +8,7 @@
   "stationId": 1234567,
   "inverterId": "1234567890",
   "loggerId": "1234567890",
-  "debug" : false,
+  "debug": false,
   "mqtt":{
     "broker": "1.1.1.1",
     "port": 1883,

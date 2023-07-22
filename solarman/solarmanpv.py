@@ -120,10 +120,11 @@ class SolarmanPV:
         else:
             mqtt_connection.message(
                 topic + "/inverter/deviceState",
-                inverter_data["deviceState"],
+                inverter_data.get("deviceState")
             )
             mqtt_connection.message(
-                topic + "/logger/deviceState", logger_data["deviceState"]
+                topic + "/logger/deviceState",
+                logger_data.get("deviceState")
             )
             logging.info(
                 "%s - Inverter DeviceState: %s"

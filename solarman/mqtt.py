@@ -8,7 +8,6 @@ from paho.mqtt import client as mqtt_client
 
 logging.basicConfig(level=logging.INFO)
 
-
 class Mqtt:
     """
     MQTT connect and publish

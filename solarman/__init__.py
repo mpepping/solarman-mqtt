@@ -7,6 +7,7 @@ import sys
 
 from .solarmanpv import SolarmanPV
 
+
 def main():
     """
     Main
@@ -51,6 +52,7 @@ def main():
         solarman.create_passhash(args.create_passhash)
     else:
         parser.print_help(sys.stderr)
+
 
 if __name__ == "__main__":
     main()

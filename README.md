@@ -242,6 +242,35 @@ AT+UPGRADE_Command_Supported: 255
 Method_Of_Protocol_Upgrade: 255
 ```
 
+## Running multiple inverter stations
+
+If you have multiple inverter stations, you can add them to the config file as a list. Make sure to publish to separate MQTT topics per inverter instance, and configure the Home Assistant MQTT sensors accordingly.
+
+```json
+[
+  {
+    "name": "Trannergy-1",
+    "stationId": 987,
+    "inverterId": 654,
+    "loggerId": 321,
+    "mqtt": {
+      "topic": "inverter1"
+    }
+  },
+  {
+    "name": "Trannergy-2",
+    "stationId": 123,
+    "inverterId": 456,
+    "loggerId": 789,
+    "mqtt": {
+      "topic": "inverter2"
+    }
+  }
+]
+```
+
+*Minimized example config; see `config.sample.json` for all fields.* 
+
 ## Home Assistant
 
 ```yaml

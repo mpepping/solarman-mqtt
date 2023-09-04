@@ -43,7 +43,7 @@ def main():
     args = parser.parse_args()
     solarman = SolarmanPV(args.file)
     if args.single:
-        solarman.single_run(args.file)
+        solarman.single_run_loop(args.file)
     elif args.daemon:
         solarman.daemon(args.file, args.interval)
     elif args.validate:

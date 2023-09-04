@@ -63,6 +63,7 @@ you still have issues, please check all values and try again.
 
 If you need any further help, please see:
 <https://github.com/mpepping/solarman-mqtt>
+
 """
 
 
@@ -85,9 +86,7 @@ class ConfigCheck:  # pylint: disable=too-few-public-methods
         except SchemaError as err:
             print(err.message)
             sys.exit(1)
-
         print(_VALID)
-        sys.exit(0)
 
 
 class HashPassword:  # pylint: disable=too-few-public-methods

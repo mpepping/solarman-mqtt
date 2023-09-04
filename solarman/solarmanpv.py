@@ -13,6 +13,7 @@ from .mqtt import Mqtt
 
 logging.basicConfig(level=logging.INFO)
 
+
 class SolarmanPV:
     """
     SolarmanPV data collection and MQTT publishing
@@ -20,9 +21,6 @@ class SolarmanPV:
 
     def __init__(self, file):
         self.config = self.load_config(file)
-        self.api    = SolarmanApi(self.config)
-        self.mqtt   = Mqtt(self.config["mqtt"])
-
 
     def load_config(self, file):
         """
@@ -31,25 +29,30 @@ class SolarmanPV:
         """
         with open(file, "r", encoding="utf-8") as config_file:
             config = json.load(config_file)
-            return config
 
+        if not isinstance(config, list):
+            config = [config]
 
-    def validate_config(self, file):
+        return config
+
+    def validate_config(self, config):
         """
         Validate config file
         :param file: Config file
         :return:
         """
-        config = self.load_config(file)
-        ConfigCheck(config)
+        config = self.load_config(config)
+        for conf in config:
+            print(
+                f"## CONFIG INSTANCE NAME: {conf['name']} [{config.index(conf) + 1}/{len(config)}]"
+            )
+            ConfigCheck(conf)
 
-
-    def single_run(self, file):
+    def single_run(self, config):
         """
         Output current watts and kilowatts
         :return:
         """
-        config = self.load_config(file)
         pvdata = SolarmanApi(config)
 
         station_data = pvdata.station_realtime
@@ -119,12 +122,10 @@ class SolarmanPV:
             )
         else:
             mqtt_connection.message(
-                topic + "/inverter/deviceState",
-                inverter_data.get("deviceState")
+                topic + "/inverter/deviceState", inverter_data.get("deviceState")
             )
             mqtt_connection.message(
-                topic + "/logger/deviceState",
-                logger_data.get("deviceState")
+                topic + "/logger/deviceState", logger_data.get("deviceState")
             )
             logging.info(
                 "%s - Inverter DeviceState: %s"
@@ -133,6 +134,10 @@ class SolarmanPV:
                 inverter_device_state,
             )
 
+    def single_run_loop(self, file):
+        config = self.load_config(file)
+        for conf in config:
+            self.single_run(conf)
 
     def daemon(self, file, interval):
         """
@@ -142,10 +147,12 @@ class SolarmanPV:
         :return:
         """
         interval = int(interval)
-        logging.info("Starting daemonized with a %s seconds run interval", str(interval))
+        logging.info(
+            "Starting daemonized with a %s seconds run interval", str(interval)
+        )
         while True:
             try:
-                SolarmanPV.single_run(self, file)
+                SolarmanPV.single_run_loop(self, file)
                 time.sleep(interval)
             except Exception as error:  # pylint: disable=broad-except
                 logging.error("Error on start: %s", str(error))
@@ -153,7 +160,6 @@ class SolarmanPV:
             except KeyboardInterrupt:
                 logging.info("Exiting on keyboard interrupt")
                 sys.exit(0)
-
 
     def create_passhash(self, password):
         """

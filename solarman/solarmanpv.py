@@ -135,6 +135,9 @@ class SolarmanPV:
             )
 
     def single_run_loop(self, file):
+        """
+        Perform single runs for all config instances
+        """
         config = self.load_config(file)
         for conf in config:
             self.single_run(conf)

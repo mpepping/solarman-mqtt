@@ -58,9 +58,12 @@ class SolarmanPV:
         station_data = pvdata.station_realtime
         inverter_data = pvdata.device_current_data_inverter
         logger_data = pvdata.device_current_data_logger
+        meter_data = pvdata.device_current_data_meter
 
         inverter_data_list = ConstructData(inverter_data).device_current_data
         logger_data_list = ConstructData(logger_data).device_current_data
+        if meter_data:
+            meter_data_list = ConstructData(meter_data).device_current_data
 
         if config.get("debug", False):
             logging.info(json.dumps("STATION DATA"))
@@ -73,6 +76,11 @@ class SolarmanPV:
             logging.info(json.dumps(logger_data, indent=4, sort_keys=True))
             logging.info(json.dumps("LOGGER DATA LIST"))
             logging.info(json.dumps(logger_data_list, indent=4, sort_keys=True))
+            if meter_data:
+                logging.info(json.dumps("METER DATA"))
+                logging.info(json.dumps(meter_data, indent=4, sort_keys=True))
+                logging.info(json.dumps("METER DATA LIST"))
+                logging.info(json.dumps(meter_data_list, indent=4, sort_keys=True))
 
         discard = ["code", "msg", "requestId", "success"]
         topic = config["mqtt"]["topic"]
@@ -83,7 +91,20 @@ class SolarmanPV:
         except KeyError:
             inverter_device_state = 128
 
+        if meter_data:
+            try:
+                meter_state = meter_data["deviceState"]
+            except KeyError:
+                meter_state = 128
+
         mqtt_connection = Mqtt(config["mqtt"])
+
+        if meter_data and meter_state == 1:
+            logging.info("%s - Meter DeviceState: %s -> Publishing to MQTT ...", _t, meter_state)
+            for i in meter_data:
+                if meter_data[i]:
+                    mqtt_connection.message(topic + "/meter/" +i, meter_data[i])
+            mqtt_connection.message(topic + "/meter/attributes", json.dumps(meter_data_list))
 
         if inverter_device_state == 1:
             logging.info(
@@ -121,6 +142,7 @@ class SolarmanPV:
                 inverter_device_state,
             )
         else:
+
             mqtt_connection.message(
                 topic + "/inverter/deviceState", inverter_data.get("deviceState")
             )

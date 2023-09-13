@@ -35,6 +35,7 @@ _SCHEMA = {
         "stationId": {"type": "number", "minimum": 100000, "maximum": 999999999},
         "inverterId": {"type": "string", "minLength": 10},
         "loggerId": {"type": "string", "minLength": 10, "maxLength": 10},
+        "metterId": {"type": "string", "minLength": 10},
         "debug": {"type": "boolean", "optional": True},
         "mqtt": {
             "type": "object",

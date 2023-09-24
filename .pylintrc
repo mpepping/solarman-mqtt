@@ -1,0 +1,13 @@
+[DESIGN]
+
+# R0902 - Maximum number of attributes for a class.
+max-attributes=10
+
+# R0912 - Maximum number of branch for function / method body.
+max-branches=20
+
+# R0914 - Maximum number of locals for function / method body.
+max-locals=20
+
+# R0915 - Maximum number of statements in function / method body.
+max-statements=100

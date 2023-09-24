@@ -100,11 +100,15 @@ class SolarmanPV:
         mqtt_connection = Mqtt(config["mqtt"])
 
         if meter_data and meter_state == 1:
-            logging.info("%s - Meter DeviceState: %s -> Publishing to MQTT ...", _t, meter_state)
+            logging.info(
+                "%s - Meter DeviceState: %s -> Publishing to MQTT ...", _t, meter_state
+            )
             for i in meter_data:
                 if meter_data[i]:
-                    mqtt_connection.message(topic + "/meter/" +i, meter_data[i])
-            mqtt_connection.message(topic + "/meter/attributes", json.dumps(meter_data_list))
+                    mqtt_connection.message(topic + "/meter/" + i, meter_data[i])
+            mqtt_connection.message(
+                topic + "/meter/attributes", json.dumps(meter_data_list)
+            )
 
         if inverter_device_state == 1:
             logging.info(
@@ -142,7 +146,6 @@ class SolarmanPV:
                 inverter_device_state,
             )
         else:
-
             mqtt_connection.message(
                 topic + "/inverter/deviceState", inverter_data.get("deviceState")
             )

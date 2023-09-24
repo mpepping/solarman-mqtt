@@ -88,6 +88,16 @@ curl --location --request POST 'https://globalapi.solarmanpv.com/station/v1.0/de
   --data-raw '{"size":10,"page":1,"stationId":1234567,"deviceType":"COLLECTOR"}'
 ```
 
+* **meterId** (optional): If you have a DTSD422 meter as part of your PV system, you can add the meter serialnumber to the config file.
+
+```json
+{
+  [..]
+  "meterId": 123
+  [..]
+}
+```
+
 A bearer TOKEN to use in the requests above can be retrieved by adding your APPID, APPSECRET, USERNAME, PASSHASH in this request:
 
 ```bash
@@ -269,7 +279,7 @@ If you have multiple inverter stations, you can add them to the config file as a
 ]
 ```
 
-*Minimized example config; see `config.sample.json` for all fields.* 
+*Minimized example config; see `config.sample.json` for all fields.*
 
 ## Home Assistant
 

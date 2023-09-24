@@ -31,6 +31,13 @@ class SolarmanApi:
             self.config["loggerId"]
         )
 
+        try:
+            self.device_current_data_meter = self.get_device_current_data(
+                self.config["meterId"]
+            )
+        except KeyError:
+            self.device_current_data_meter = None
+
     def get_token(self, appid, secret, username, passhash):
         """
         Get a token from the API

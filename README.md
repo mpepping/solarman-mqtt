@@ -284,32 +284,30 @@ If you have multiple inverter stations, you can add them to the config file as a
 ## Home Assistant
 
 ```yaml
-sensor:
-  - platform: mqtt
-    name: "solarmanpv_station_generationPower"
-    state_topic: "solarmanpv/station/generationPower"
-    unique_id: "generatedPower"
-    unit_of_measurement: "Wh"
-    device_class: energy
-    state_class: measurement
+mqtt:
+  sensor:
+    - name: "solarmanpv_station_generationPower"
+      state_topic: "solarmanpv/station/generationPower"
+      unique_id: "generatedPower"
+      unit_of_measurement: "Wh"
+      device_class: energy
+      state_class: measurement
 ```
 
 Repeat for every station topic needed.
 
 ```yaml
+    - name: "solarmanpv_inverter"
+      unique_id: "solarmanpv_inverter"
+      state_topic: "solarmanpv/inverter/deviceState"
+      json_attributes_topic: "solarmanpv/inverter/attributes"
+
+    - name: "solarmanpv_logger"
+      unique_id: "solarmanpv_logger"
+      state_topic: "solarmanpv/logger/deviceState"
+      json_attributes_topic: "solarmanpv/logger/attributes"
+
 sensor:
-  - platform: mqtt
-    name: "solarmanpv_inverter"
-    unique_id: "solarmanpv_inverter"
-    state_topic: "solarmanpv/inverter/deviceState"
-    json_attributes_topic: "solarmanpv/inverter/attributes"
-
-  - platform: mqtt
-    name: "solarmanpv_logger"
-    unique_id: "solarmanpv_logger"
-    state_topic: "solarmanpv/logger/deviceState"
-    json_attributes_topic: "solarmanpv/logger/attributes"
-
   - platform: template
     sensors:
       solarmanpv_inverter_device_state:

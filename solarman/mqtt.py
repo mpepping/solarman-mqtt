@@ -23,7 +23,7 @@ class Mqtt:
         self.password = config["password"]
         self.qos = config.get("qos", 0)
         self.retain = config.get("retain", False)
-        self.client = self.connect(self)
+        self.client = self.connect()
 
     def connect(self):
         """

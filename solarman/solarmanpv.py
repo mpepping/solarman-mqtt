@@ -180,7 +180,7 @@ class SolarmanPV:
         )
         while True:
             try:
-                SolarmanPV.single_run_loop(self, file)
+                self.single_run_loop(self, file)
                 time.sleep(interval)
             except Exception as error:  # pylint: disable=broad-except
                 logging.error("Error on start: %s", str(error))

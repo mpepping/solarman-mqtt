@@ -87,16 +87,10 @@ class SolarmanPV:
         topic = config["mqtt"]["topic"]
 
         _t = time.strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            inverter_device_state = inverter_data["deviceState"]
-        except KeyError:
-            inverter_device_state = 128
+        inverter_device_state = inverter_data.get("deviceState", 128)
 
         if meter_data:
-            try:
-                meter_state = meter_data["deviceState"]
-            except KeyError:
-                meter_state = 128
+            meter_state = meter_data.get("deviceState", 128)
 
         mqtt_connection = Mqtt(config["mqtt"])
 

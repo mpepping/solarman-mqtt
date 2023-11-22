@@ -154,7 +154,7 @@ class SolarmanPV:
                 inverter_device_state,
             )
 
-    def single_run_loop(self, file):
+    def single_run_loop(self):
         """
         Perform single runs for all config instances
         """
@@ -174,7 +174,7 @@ class SolarmanPV:
         )
         while True:
             try:
-                self.single_run_loop(self, file)
+                self.single_run_loop()
                 time.sleep(interval)
             except KeyboardInterrupt:
                 logging.info("Exiting on keyboard interrupt")

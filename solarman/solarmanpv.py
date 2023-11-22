@@ -161,7 +161,7 @@ class SolarmanPV:
         for conf in self.config:
             self.single_run(conf)
 
-    def daemon(self, file, interval):
+    def daemon(self, interval):
         """
         Run as a daemon process
         :param file: Config file

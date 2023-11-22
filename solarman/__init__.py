@@ -45,7 +45,7 @@ def main():
     if args.single:
         solarman.single_run_loop()
     elif args.daemon:
-        solarman.daemon(args.file, args.interval)
+        solarman.daemon(args.interval)
     elif args.validate:
         solarman.validate_config(args.file)
     elif args.create_passhash:

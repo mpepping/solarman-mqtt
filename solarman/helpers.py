@@ -88,22 +88,3 @@ class ConfigCheck:  # pylint: disable=too-few-public-methods
             print(err.message)
             sys.exit(1)
         print(_VALID)
-
-
-class HashPassword:  # pylint: disable=too-few-public-methods
-    """
-    Hash the password
-    """
-
-    def __init__(self, password):
-        self.password = password
-        self.hashed = ""
-        HashPassword.hash(self)
-
-    def hash(self):
-        """
-        Return hashed string
-        :return:
-        """
-        self.hashed = hashlib.sha256(self.password.encode("utf-8")).hexdigest()
-        return self.hashed

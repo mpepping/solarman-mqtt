@@ -8,8 +8,9 @@ import sys
 import time
 
 from .api import SolarmanApi, ConstructData
-from .helpers import ConfigCheck, HashPassword
+from .helpers import ConfigCheck
 from .mqtt import Mqtt
+from hashlib import sha256
 
 logging.basicConfig(level=logging.INFO)
 
@@ -195,5 +196,6 @@ class SolarmanPV:
         :param password: Password
         :return:
         """
-        pwstring = HashPassword(password)
-        print(pwstring.hashed)
+        passhash = sha256(password.encode()).hexdigest()
+        print(passhash)
+        return passhash

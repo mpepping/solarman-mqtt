@@ -164,8 +164,7 @@ class SolarmanPV:
         """
         Perform single runs for all config instances
         """
-        config = self.load_config(file)
-        for conf in config:
+        for conf in self.config:
             self.single_run(conf)
 
     def daemon(self, file, interval):

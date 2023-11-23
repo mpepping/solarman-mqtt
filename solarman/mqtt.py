@@ -22,6 +22,7 @@ class Mqtt:
         self.username = config["username"]
         self.password = config["password"]
         self.qos = config.get("qos", 0)
+        self.topic_prefix = config["topic"]
         self.retain = config.get("retain", False)
         self.client = self.connect()
 
@@ -43,6 +44,7 @@ class Mqtt:
         :param msg: Message payload
         :return:
         """
+        topic = self.topic_prefix + topic
         result = self.client.publish(topic, msg, self.qos, self.retain)
         # result: [0, 1]
         status = result[0]

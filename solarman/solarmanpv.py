@@ -84,7 +84,6 @@ class SolarmanPV:
                 logging.info(json.dumps(meter_data_list, indent=4, sort_keys=True))
 
         discard = ["code", "msg", "requestId", "success"]
-        topic = config["mqtt"]["topic"]
 
         _t = time.strftime("%Y-%m-%d %H:%M:%S")
         inverter_device_state = inverter_data.get("deviceState", 128)
@@ -100,9 +99,9 @@ class SolarmanPV:
             )
             for i in meter_data:
                 if meter_data[i]:
-                    mqtt_connection.message(topic + "/meter/" + i, meter_data[i])
+                    mqtt_connection.message("/meter/" + i, meter_data[i])
             mqtt_connection.message(
-                topic + "/meter/attributes", json.dumps(meter_data_list)
+                "/meter/attributes", json.dumps(meter_data_list)
             )
 
         if inverter_device_state == 1:
@@ -113,23 +112,23 @@ class SolarmanPV:
             )
             for i in station_data:
                 if station_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/station/" + i, station_data[i])
+                    mqtt_connection.message("/station/" + i, station_data[i])
 
             for i in inverter_data:
                 if inverter_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/inverter/" + i, inverter_data[i])
+                    mqtt_connection.message("/inverter/" + i, inverter_data[i])
 
             mqtt_connection.message(
-                topic + "/inverter/attributes",
+                "/inverter/attributes",
                 json.dumps(inverter_data_list),
             )
 
             for i in logger_data:
                 if logger_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/logger/" + i, logger_data[i])
+                    mqtt_connection.message("/logger/" + i, logger_data[i])
 
             mqtt_connection.message(
-                topic + "/logger/attributes",
+                "/logger/attributes",
                 json.dumps(logger_data_list),
             )
 
@@ -142,10 +141,10 @@ class SolarmanPV:
             )
         else:
             mqtt_connection.message(
-                topic + "/inverter/deviceState", inverter_data.get("deviceState")
+                "/inverter/deviceState", inverter_data.get("deviceState")
             )
             mqtt_connection.message(
-                topic + "/logger/deviceState", logger_data.get("deviceState")
+                "/logger/deviceState", logger_data.get("deviceState")
             )
             logging.info(
                 "%s - Inverter DeviceState: %s"

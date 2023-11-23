@@ -4,6 +4,7 @@ MQTT connect and publish
 
 import logging
 import random
+
 from paho.mqtt import client as mqtt_client
 
 logging.basicConfig(level=logging.INFO)
@@ -57,4 +58,4 @@ class Mqtt:
         """
         MQTT Send message to selected topic
         """
-        self.publish(self, topic, msg)
+        self.publish(topic, msg)

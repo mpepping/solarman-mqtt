@@ -6,11 +6,11 @@ import json
 import logging
 import sys
 import time
+from hashlib import sha256
 
-from .api import SolarmanApi, ConstructData
+from .api import ConstructData, SolarmanApi
 from .helpers import ConfigCheck
 from .mqtt import Mqtt
-from hashlib import sha256
 
 logging.basicConfig(level=logging.INFO)
 

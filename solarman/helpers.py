@@ -2,11 +2,10 @@
 Validate the JSON schema and contents used for the config file.
 """
 
-import hashlib
 import sys
+
 from jsonschema import validate
-from jsonschema.exceptions import ValidationError
-from jsonschema.exceptions import SchemaError
+from jsonschema.exceptions import SchemaError, ValidationError
 
 _SCHEMA = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",

@@ -6,9 +6,10 @@ import json
 import logging
 import sys
 import time
+from hashlib import sha256
 
-from .api import SolarmanApi, ConstructData
-from .helpers import ConfigCheck, HashPassword
+from .api import ConstructData, SolarmanApi
+from .helpers import ConfigCheck
 from .mqtt import Mqtt
 
 logging.basicConfig(level=logging.INFO)
@@ -83,19 +84,12 @@ class SolarmanPV:
                 logging.info(json.dumps(meter_data_list, indent=4, sort_keys=True))
 
         discard = ["code", "msg", "requestId", "success"]
-        topic = config["mqtt"]["topic"]
 
         _t = time.strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            inverter_device_state = inverter_data["deviceState"]
-        except KeyError:
-            inverter_device_state = 128
+        inverter_device_state = inverter_data.get("deviceState", 128)
 
         if meter_data:
-            try:
-                meter_state = meter_data["deviceState"]
-            except KeyError:
-                meter_state = 128
+            meter_state = meter_data.get("deviceState", 128)
 
         mqtt_connection = Mqtt(config["mqtt"])
 
@@ -105,9 +99,9 @@ class SolarmanPV:
             )
             for i in meter_data:
                 if meter_data[i]:
-                    mqtt_connection.message(topic + "/meter/" + i, meter_data[i])
+                    mqtt_connection.message("/meter/" + i, meter_data[i])
             mqtt_connection.message(
-                topic + "/meter/attributes", json.dumps(meter_data_list)
+                "/meter/attributes", json.dumps(meter_data_list)
             )
 
         if inverter_device_state == 1:
@@ -118,23 +112,23 @@ class SolarmanPV:
             )
             for i in station_data:
                 if station_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/station/" + i, station_data[i])
+                    mqtt_connection.message("/station/" + i, station_data[i])
 
             for i in inverter_data:
                 if inverter_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/inverter/" + i, inverter_data[i])
+                    mqtt_connection.message("/inverter/" + i, inverter_data[i])
 
             mqtt_connection.message(
-                topic + "/inverter/attributes",
+                "/inverter/attributes",
                 json.dumps(inverter_data_list),
             )
 
             for i in logger_data:
                 if logger_data[i] and i not in discard:
-                    mqtt_connection.message(topic + "/logger/" + i, logger_data[i])
+                    mqtt_connection.message("/logger/" + i, logger_data[i])
 
             mqtt_connection.message(
-                topic + "/logger/attributes",
+                "/logger/attributes",
                 json.dumps(logger_data_list),
             )
 
@@ -147,10 +141,10 @@ class SolarmanPV:
             )
         else:
             mqtt_connection.message(
-                topic + "/inverter/deviceState", inverter_data.get("deviceState")
+                "/inverter/deviceState", inverter_data.get("deviceState")
             )
             mqtt_connection.message(
-                topic + "/logger/deviceState", logger_data.get("deviceState")
+                "/logger/deviceState", logger_data.get("deviceState")
             )
             logging.info(
                 "%s - Inverter DeviceState: %s"
@@ -159,15 +153,14 @@ class SolarmanPV:
                 inverter_device_state,
             )
 
-    def single_run_loop(self, file):
+    def single_run_loop(self):
         """
         Perform single runs for all config instances
         """
-        config = self.load_config(file)
-        for conf in config:
+        for conf in self.config:
             self.single_run(conf)
 
-    def daemon(self, file, interval):
+    def daemon(self, interval):
         """
         Run as a daemon process
         :param file: Config file
@@ -180,14 +173,14 @@ class SolarmanPV:
         )
         while True:
             try:
-                SolarmanPV.single_run_loop(self, file)
+                self.single_run_loop()
                 time.sleep(interval)
-            except Exception as error:  # pylint: disable=broad-except
-                logging.error("Error on start: %s", str(error))
-                sys.exit(1)
             except KeyboardInterrupt:
                 logging.info("Exiting on keyboard interrupt")
                 sys.exit(0)
+            except Exception as error:  # pylint: disable=broad-except
+                logging.error("Error on start: %s", str(error))
+                sys.exit(1)
 
     def create_passhash(self, password):
         """
@@ -195,5 +188,6 @@ class SolarmanPV:
         :param password: Password
         :return:
         """
-        pwstring = HashPassword(password)
-        print(pwstring.hashed)
+        passhash = sha256(password.encode()).hexdigest()
+        print(passhash)
+        return passhash

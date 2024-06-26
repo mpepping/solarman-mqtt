@@ -91,6 +91,7 @@ class SolarmanPV:
         except KeyError:
             inverter_device_state = 128
 
+        meter_state = None
         if meter_data:
             try:
                 meter_state = meter_data["deviceState"]

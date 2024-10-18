@@ -88,6 +88,7 @@ class SolarmanPV:
         _t = time.strftime("%Y-%m-%d %H:%M:%S")
         inverter_device_state = inverter_data.get("deviceState", 128)
 
+        meter_state = None
         if meter_data:
             meter_state = meter_data.get("deviceState", 128)
 

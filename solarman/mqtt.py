@@ -4,6 +4,7 @@ MQTT connect and publish
 
 import logging
 import random
+
 from paho.mqtt import client as mqtt_client
 
 logging.basicConfig(level=logging.INFO)
@@ -22,8 +23,9 @@ class Mqtt:
         self.username = config["username"]
         self.password = config["password"]
         self.qos = config.get("qos", 0)
+        self.topic_prefix = config["topic"]
         self.retain = config.get("retain", False)
-        self.client = Mqtt.connect(self)
+        self.client = self.connect()
 
     def connect(self):
         """
@@ -36,15 +38,15 @@ class Mqtt:
         client.connect(self.broker, self.port)
         return client
 
-    def publish(self, client, topic, msg):
+    def publish(self, topic, msg):
         """
         Publish a message on a MQTT topic
-        :param client: Connect parameters
         :param topic: MQTT topic
         :param msg: Message payload
         :return:
         """
-        result = client.publish(topic, msg, self.qos, self.retain)
+        topic = self.topic_prefix + topic
+        result = self.client.publish(topic, msg, self.qos, self.retain)
         # result: [0, 1]
         status = result[0]
         if status == 0:
@@ -56,4 +58,4 @@ class Mqtt:
         """
         MQTT Send message to selected topic
         """
-        Mqtt.publish(self, self.client, topic, msg)
+        self.publish(topic, msg)

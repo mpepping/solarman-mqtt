@@ -2,11 +2,10 @@
 Validate the JSON schema and contents used for the config file.
 """
 
-import hashlib
 import sys
+
 from jsonschema import validate
-from jsonschema.exceptions import ValidationError
-from jsonschema.exceptions import SchemaError
+from jsonschema.exceptions import SchemaError, ValidationError
 
 _SCHEMA = {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -88,22 +87,3 @@ class ConfigCheck:  # pylint: disable=too-few-public-methods
             print(err.message)
             sys.exit(1)
         print(_VALID)
-
-
-class HashPassword:  # pylint: disable=too-few-public-methods
-    """
-    Hash the password
-    """
-
-    def __init__(self, password):
-        self.password = password
-        self.hashed = ""
-        HashPassword.hash(self)
-
-    def hash(self):
-        """
-        Return hashed string
-        :return:
-        """
-        self.hashed = hashlib.sha256(self.password.encode("utf-8")).hexdigest()
-        return self.hashed

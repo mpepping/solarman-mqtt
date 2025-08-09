@@ -1,5 +1,8 @@
 # solarman-mqtt
 
+> [!NOTE]
+> This repository is archived and no longer actively maintained.
+
 Script to retrieve current Solar PV data from the Solarman API, and send Power (W) and Energy (kWh) metrics to a MQTT broker, for further use in home automation. Several PV vendors use the Solarman Smart platform for statistics. One example is the Trannergy PV converter.
 
 ```bash
